@@ -2,8 +2,8 @@
 @import "https://unpkg.com/open-props/open-props.min.css";
 
 body {
-	min-height: 100vh;
-	font-family:  'Inter', sans-serif, system-ui;
+  min-height: 100vh;
+  font-family:  'Inter', sans-serif, system-ui;
   background: var(--surface-1);
   display: grid;
   justify-items: center;
@@ -20,12 +20,6 @@ body {
 main {
   display: grid;
   align: center;
-}
-
-
-main img {
-  position: relative;
-  left:20%;
 }
 
 h1 {

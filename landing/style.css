@@ -154,7 +154,15 @@ section img {
 
 section img {
   --y: 0;
+  perspective: 200px;
+  transition: all .2s ease;
 }
+
+section img:hover {
+    transform: matrix3d(0.94, 0, 0.34, -0.0002, 0, 1, 0, 0, -0.34, 0, 0.94, 0, 1, 0, 10, 1)
+               translateX(-10px);
+}
+
 section p {
   --x: 0;
   --y: 50%;
@@ -169,6 +177,7 @@ section p {
   position: sticky;
   bottom: 40%;
 }
+
 
 @-webkit-keyframes item-reveal {
   0% {
