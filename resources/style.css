@@ -6,8 +6,8 @@ body {
   font-family:  'Inter', sans-serif, system-ui;
   background: var(--surface-1);
   display: grid;
-  justify-items: center;
-  align-content: center;
+  justify-items: right;
+  align-content: right;
   overflow-x: hidden;
 }
 
@@ -19,7 +19,7 @@ body {
 
 main {
   display: grid;
-  align: center;
+  align: right;
 }
 
 h1 {
