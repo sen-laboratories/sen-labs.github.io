@@ -19,7 +19,12 @@ body {
 
 main {
   display: grid;
-  align: right;
+  align-content: right;
+}
+
+footer {
+  display: grid;
+  align-content: right;
 }
 
 h1 {
