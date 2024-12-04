@@ -65,6 +65,15 @@ h2 {
   white-space: nowrap;
 }
 
+h3 {
+  font-weight: 200;
+  font-family: Visby;
+  font-size: calc(var(--font-size-fluid-3) * 0.5);
+  line-height: 1.1;
+  z-index: 2;
+  position: relative;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -214,8 +223,8 @@ footer div {
     translate: var(--x, 0) var(--y, 0);
   }
 }
- /* social media button styles */
-.fa {
+/* social media button styles */
+.sm {
   padding: 20px;
   font-size: 30px;
   width: 30px;
@@ -225,6 +234,7 @@ footer div {
   border-radius: 50%;
 }
 
-.fa:hover {
+.sm:hover {
     opacity: 0.7;
 }
+
