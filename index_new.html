@@ -58,16 +58,19 @@
     }
     /* Hero Section */
     .hero {
-      padding: 80px 0;
+      padding: 80px 0 40px 0;
       text-align: center;
       background: #1A1A1A;
     }
     .logo {
       width: 200px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+    }
+    .hero .logo {
+      width: 520px; /* Updated size for top logo */
     }
     .claim {
-      font-family: 'Visby Bold', sans-serif;
+      font-family: 'Visby Regular', sans-serif;
       font-size: 28px;
       margin-bottom: 15px;
       color: #78b4ff;
@@ -90,6 +93,7 @@
       justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
+      margin-bottom: 20px;
     }
     .btn {
       font-family: 'Visby Bold', sans-serif;
@@ -113,6 +117,15 @@
       text-decoration: underline;
       text-decoration-color: #FF33CC;
     }
+    .waitlist-caption {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 14px;
+      color: #F7F2E1;
+      margin-top: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
     .placeholder {
       color: #F7F2E1;
       font-family: 'Visby Regular', sans-serif;
@@ -128,6 +141,11 @@
     .placeholder.dragging {
       transform: translateY(-10px) scale(1.2);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+    .placeholder-img {
+      width: 100%;
+      height: auto;
+      display: block;
     }
     /* Haiku-Style Tab for Placeholders */
     .placeholder-tab {
@@ -158,7 +176,7 @@
     }
     /* Features Section */
     .features {
-      padding: 80px 0;
+      padding: 40px 0 80px 0;
       text-align: center;
       background: #1A1A1A;
     }
@@ -217,14 +235,14 @@
       color: #F4F4F4;
       margin-top: 40px;
       display: inline-block;
-      max-width: 200px;
+      max-width: 250px;
     }
     .btn-demo:hover {
       box-shadow: 0 0 12px rgba(255, 51, 204, 0.6);
       text-decoration: underline;
       text-decoration-color: #2EBFD4;
     }
-    /* Connect Section */
+    /* Connect Section (Renamed to Stay Tuned) */
     .connect {
       padding: 60px 0;
       text-align: center;
@@ -248,8 +266,8 @@
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
     }
     .connect-links .social-card {
-      width: 150px;
-      height: 100px;
+      width: 250px; /* Increased by 25% */
+      height: 150px; /* Increased by 25% */
       background: #222222;
       border: 1px solid #2EBFD4;
       border-radius: 4px;
@@ -276,7 +294,7 @@
     }
     .connect-links .social-card .preview span {
       font-family: 'Visby Regular', sans-serif;
-      font-size: 12px;
+      font-size: 14px;
       color: #F7F2E1;
       text-align: center;
       padding: 5px;
@@ -287,12 +305,18 @@
       background: #2EBFD4;
       color: #F4F4F4;
       font-family: 'Visby Regular', sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       padding: 5px;
+    }
+    /* Waitlist Section */
+    .waitlist {
+      padding: 60px 0;
+      text-align: center;
+      background: #1A1A1A;
     }
     /* Newsletter Section */
     .newsletter {
@@ -316,7 +340,7 @@
       text-align: center;
     }
     .footer .logo {
-      width: 100px;
+      width: 200px; /* Updated size for footer logo */
       margin-bottom: 20px;
     }
     .footer p {
@@ -349,14 +373,18 @@
     @media (max-width: 768px) {
       .claim { font-size: 22px; }
       .subclaim { font-size: 14px; }
+      .waitlist-caption { font-size: 12px; }
       h2 { font-size: 22px; }
       .placeholder { max-width: 90%; }
       .connect-links .social-card {
-        width: 120px;
-        height: 80px;
+        width: 200px; /* Increased by 25% for mobile */
+        height: 125px; /* Increased by 25% for mobile */
+      }
+      .connect-links .social-card .preview span {
+        font-size: 13px;
       }
       .connect-links .social-card .caption {
-        font-size: 12px;
+        font-size: 14px;
       }
     }
   </style>
@@ -370,16 +398,9 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="container">
-      <img src="/static/sen-logo.webp" alt="SEN Logo" class="logo">
+      <img src="images/sen-logo.webp" alt="SEN Logo" class="logo">
       <h1 class="claim">a <span class="path">/home</span> for your thoughts</h1>
       <p class="subclaim">Link local files, reference data seamlessly, and manage your personal knowledge right on your desktop – all open-source and integrated into your filesystem.</p>
-      <div class="cta-buttons">
-        <a href="mailto:waitlist@sen-labs.org" class="btn btn-primary">Join the Waitlist</a>
-      </div>
-      <div class="placeholder">
-        <div class="placeholder-tab" data-max-width="70%"><span>Screenshot</span></div>
-        SEN Interface Screenshot Placeholder (Add /static/screenshot.webp)
-      </div>
     </div>
   </section>
 
@@ -389,29 +410,59 @@
       <h2>Why SEN?</h2>
       <p>Your desktop, reimagined for thought.</p>
       <div class="feature-grid">
+        <!-- Filesystem Integration -->
         <div class="feature-card">
           <div class="placeholder">
             <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
-            Feature Screenshot Placeholder (Add /static/feature1.webp)
-          </div>
-          <h3>Semantic Links</h3>
-          <p>> Connect ideas across files.</p>
-        </div>
-        <div class="feature-card">
-          <div class="placeholder">
-            <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
-            Feature Screenshot Placeholder (Add /static/feature2.webp)
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Filesystem Integration Screenshot" class="placeholder-img">
           </div>
           <h3>Filesystem Integration</h3>
           <p>> Seamlessly ties into your system.</p>
         </div>
+        <!-- Semantic Links -->
         <div class="feature-card">
           <div class="placeholder">
             <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
-            Feature Screenshot Placeholder (Add /static/feature3.webp)
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Semantic Links Screenshot" class="placeholder-img">
           </div>
-          <h3>Open-Source</h3>
-          <p>> Free and community-driven.</p>
+          <h3>Semantic Links</h3>
+          <p>> Connect ideas across files.</p>
+        </div>
+        <!-- Native Relations -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Native Relations Screenshot" class="placeholder-img">
+          </div>
+          <h3>Native Relations</h3>
+          <p>> Dynamic relations and inference.</p>
+        </div>
+        <!-- Local First -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Principle</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Local First Screenshot" class="placeholder-img">
+          </div>
+          <h3>Local First</h3>
+          <p>> Your Knowledge, Your Control</p>
+        </div>
+        <!-- Remote on Demand -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Principle</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Remote on Demand Screenshot" class="placeholder-img">
+          </div>
+          <h3>Remote on Demand</h3>
+          <p>> Fetch open metadata when needed</p>
+        </div>
+        <!-- With SEN, you CAN -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Principle</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="No-Code Apps Screenshot" class="placeholder-img">
+          </div>
+          <h3>With SEN, you CAN</h3>
+          <p>> No-Code Power—Build Data-Driven Apps</p>
         </div>
       </div>
     </div>
@@ -421,27 +472,27 @@
   <section class="demo">
     <div class="container">
       <h2>SEN in Action</h2>
-      <p>Watch how SEN organizes your thoughts.</p>
+      <p>Watch SEN grow and support the vision.</p>
       <div class="placeholder">
         <div class="placeholder-tab" data-max-width="70%"><span>Demo</span></div>
-        Demo Screenshot Placeholder (Add /static/demo.webp)
+        <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="SEN in Action Screenshot" class="placeholder-img">
       </div>
-      <a href="/demo.html" class="btn btn-demo">View Demo</a>
+      <a href="/use-cases.html" class="btn btn-demo">View More Use Cases</a>
     </div>
   </section>
 
-  <!-- Connect Section -->
+  <!-- Connect Section (Renamed to Stay Tuned) -->
   <section class="connect">
     <div class="container">
-      <h2>Get Involved</h2>
-      <p>Contribute, follow, or stay updated.</p>
+      <h2>Stay Tuned</h2>
+      <p>Get the latest project updates here:</p>
       <div class="connect-links">
         <a href="https://github.com/sen-labs">
           <div class="social-card">
             <div class="preview">
               <img src="https://github.com/sen-labs/sen/workflows/CI/badge.svg" alt="GitHub Build Status">
             </div>
-            <div class="caption">Star us on GitHub</div>
+            <div class="caption">Star on GitHub</div>
           </div>
         </a>
         <a href="/blog.html">
@@ -449,7 +500,7 @@
             <div class="preview">
               <span>Latest Blog Post: "Introducing SEN v1.0"</span>
             </div>
-            <div class="caption">Read our Blog</div>
+            <div class="caption">Read the Blog</div>
           </div>
         </a>
         <a href="https://x.com/sen_labs">
@@ -472,17 +523,27 @@
     </div>
   </section>
 
+  <!-- Waitlist Section -->
+  <section class="waitlist">
+    <div class="container">
+      <div class="cta-buttons">
+        <a href="mailto:waitlist@sen-labs.org" class="btn btn-primary" target="_blank">Join the Waitlist</a>
+      </div>
+      <p class="waitlist-caption">Be the first to try the technical preview release!</p>
+    </div>
+  </section>
+
   <!-- Newsletter Section -->
   <section class="newsletter">
     <div class="container">
-      <a href="https://sen.substack.com" class="btn">Join our Newsletter</a>
+      <a href="https://sen.substack.com" class="btn">Join the Newsletter</a>
     </div>
   </section>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <img src="/static/sen-logo.webp" alt="SEN Logo" class="logo">
+      <img src="images/sen-logo.webp" alt="SEN Logo" class="logo">
       <p>© 2025 SEN Labs. a <span class="path">/home</span> for your thoughts.</p>
       <div class="footer-links">
         <a href="https://github.com/sen-labs"><i class='bx bxl-github'></i>GitHub</a>
@@ -531,7 +592,6 @@
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          console.log('Card visible:', entry.target, 'Bounding rect:', entry.boundingClientRect.top, 'Viewport height:', window.innerHeight);
           entry.target.classList.add('visible');
           observer.unobserve(entry.target);
         }
@@ -663,6 +723,31 @@
 
       parent.addEventListener('touchend', () => {
         if (!isDragging) parent.classList.remove('dragging');
+      });
+    });
+
+    // Screenshot Animation on Hover
+    document.querySelectorAll('.placeholder').forEach(placeholder => {
+      const img = placeholder.querySelector('.placeholder-img');
+      const stillSrc = img.src;
+      const animatedSrc = img.getAttribute('data-animated-src');
+
+      placeholder.addEventListener('mouseenter', () => {
+        img.src = animatedSrc;
+      });
+
+      placeholder.addEventListener('mouseleave', () => {
+        img.src = stillSrc;
+      });
+
+      // Fallback for touch devices: toggle animation on tap
+      placeholder.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (img.src === stillSrc) {
+          img.src = animatedSrc;
+        } else {
+          img.src = stillSrc;
+        }
       });
     });
   </script>
