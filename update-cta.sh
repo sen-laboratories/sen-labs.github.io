@@ -1,8 +1,36 @@
 #!/bin/bash
 
 # Configuration
-HTML_FILE="index_new.html"              # Path to your HTML file
-TEMP_FILE="index_new_temp.html"         # Temporary file for updates
+
+# Public environment variables
+
+# YouTube channel ID for SEN Labs (e.g., UC_sen-labs)
+YOUTUBE_CHANNEL_ID="UCRR013YJAj1i4qM_KYciNaw"
+
+# GITHUB_ORG: GitHub organization name (e.g., sen-laboratories)
+GITHUB_ORG="sen-laboratories"
+
+# X_USER_ID: Static user ID for the X account to fetch tweets from
+X_USER_ID="1384973683287105536"
+
+# File paths (local to the script):
+HTML_FILE="index_new.html"      # Path to the HTML file to update
+TEMP_FILE="index_new_temp.html" # Temporary file for HTML updates
+
+# Private environment variables - need to be provided by environment (or Github secrets for workflow)
+
+# GITHUB_TOKEN: Optional GitHub personal access token for authenticated API access
+# YOUTUBE_API_KEY: API key for YouTube Data API v3
+# X_BEARER_TOKEN: Bearer token for X API v2 authentication
+
+# Check for required environment variables
+REQUIRED_VARS=("YOUTUBE_API_KEY" "X_BEARER_TOKEN")
+for VAR in "${REQUIRED_VARS[@]}"; do
+  if [ -z "${!VAR}" ]; then
+    echo "Error: Required environment variable $VAR is not set."
+    exit 1
+  fi
+done
 
 # Parse command-line flag
 EXCLUDE_WEB_REPO=0
@@ -108,7 +136,7 @@ fetch_github_data() {
 # Function to fetch the latest X post
 fetch_x_post() {
   echo "Fetching latest X post..."
-  RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets?max_results=1&exclude=replies,retweets")
+  RESPONSE=$(curl -v -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets?max_results=10&exclude=retweets&tweet.fields=text")
   HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
   TWEET_RESPONSE=$(echo "$RESPONSE" | sed -e '$d')  # Remove status line to get JSON
 
