@@ -1,0 +1,33 @@
+name: Update CTA Previews
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # Runs daily at midnight UTC
+  workflow_dispatch:      # Allows manual triggering
+
+jobs:
+  update-cta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up jq
+        run: sudo apt-get install jq
+
+      - name: Run update script
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+        run: |
+          chmod +x update_cta.sh
+          ./update_cta.sh
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "bot@sen-labs.org"
+          git config --global user.name "SEN Labs Bot"
+          git add index_new.html
+          git commit -m "Update CTA previews with latest data"
+          git push
