@@ -21,8 +21,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
-          chmod +x update_cta.sh
-          ./update_cta.sh --exclude-web-repo
+          chmod +x update-cta.sh
+          ./update-cta.sh --exclude-web-repo
 
       - name: Commit and push changes
         run: |
