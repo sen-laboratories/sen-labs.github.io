@@ -28,6 +28,13 @@ jobs:
         run: |
           git config --global user.email "bot@sen-labs.org"
           git config --global user.name "SEN Labs Bot"
-          git add index_new.html
-          git commit -m "Update CTA previews with latest data"
-          git push
+          if [[ `git status --porcelain` ]]; then
+            # add and push changes          
+            git add index_new.html
+            git commit -m "Update CTA previews with latest content"
+            git push
+          else
+            # No changes
+            echo nothing changed, done.
+          fi
+          
