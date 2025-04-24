@@ -32,7 +32,7 @@ jobs:
             # No changes
             echo nothing changed, done.
           else
-	        git add index_new.html
+            git add index_new.html
             git commit -m "Update CTA previews with latest content"
             git push
             echo pushed latest changes, done.
