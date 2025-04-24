@@ -1,20 +1,12 @@
 #!/bin/bash
 
 # Configuration
+YOUTUBE_CHANNEL_ID="UCRR013YJAj1i4qM_KYciNaw"
+GITHUB_ORG="sen-laboratories"
+X_USER_ID="1384973683287105536"
 
-# Public configuration variables (safe to hardcode)
-YOUTUBE_CHANNEL_ID="UCRR013YJAj1i4qM_KYciNaw"  # YouTube channel ID for SEN Labs
-GITHUB_ORG="sen-laboratories"                    # GitHub organization name
-X_USER_ID="1384973683287105536"                 # Static user ID for the X account to fetch tweets from
-
-# Private environment variables (must be provided by environment, e.g., GitHub Actions or local shell):
-# YOUTUBE_API_KEY: API key for YouTube Data API v3
-# X_BEARER_TOKEN: Bearer token for X API v2 authentication
-# GITHUB_TOKEN: Optional GitHub personal access token for authenticated API access
-
-# File paths (local to the script):
-HTML_FILE="index_new.html"      # Path to the HTML file to update
-TEMP_FILE="index_new_temp.html" # Temporary file for HTML updates
+HTML_FILE="index_new.html"
+TEMP_FILE="index_new_temp.html"
 
 # Check for required environment variables
 REQUIRED_VARS=("YOUTUBE_API_KEY" "X_BEARER_TOKEN")
@@ -42,19 +34,19 @@ done
 
 # Ensure required tools are installed
 if ! command -v jq &> /dev/null; then
-  echo "Error: jq is required but not installed. Please install jq."
+  echo "Error: jq is required but not installed."
   exit 1
 fi
 if ! command -v curl &> /dev/null; then
-  echo "Error: curl is required but not installed. Please install curl."
+  echo "Error: curl is required but not installed."
   exit 1
 fi
 if ! command -v python3 &> /dev/null; then
-  echo "Error: python3 is required for HTML entity unescaping but not installed."
+  echo "Error: python3 is required for HTML entity unescaping."
   exit 1
 fi
 
-# Initialize preview variables with fallback content
+# Initialize preview variables
 YOUTUBE_PREVIEW='<span>No video loaded</span>'
 GITHUB_PREVIEW='<span>No commit loaded</span>'
 X_PREVIEW='<span>No post loaded</span>'
@@ -81,13 +73,16 @@ fetch_youtube_video() {
 
   echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
   YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\">"
-  sed "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1"
-  mv "$TEMP_FILE.1" "$TEMP_FILE"
-  mv "$TEMP_FILE" "$HTML_FILE"
+  sed -i.bak "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE" && \
+    rm "$TEMP_FILE.bak"
+  if [ $? -ne 0 ]; then
+    echo "Failed to update YouTube section."
+    return 1
+  fi
   return 0
 }
 
-# Function to fetch the latest commit across all public repos in the organization
+# Function to fetch the latest commit across all public repos
 fetch_github_data() {
   echo "Fetching latest GitHub commit..."
   AUTH_HEADER=""
@@ -109,7 +104,6 @@ fetch_github_data() {
   COMMIT_REPO=""
 
   for REPO in "${REPO_NAMES[@]}"; do
-    # Skip sen-labs.github.io if --exclude-web-repo is set
     if [ "$EXCLUDE_WEB_REPO" -eq 1 ] && [ "$REPO" = "sen-labs.github.io" ]; then
       continue
     fi
@@ -130,21 +124,22 @@ fetch_github_data() {
 
   echo "Latest GitHub commit: $COMMIT_MESSAGE (SHA: $COMMIT_SHA, Repo: $COMMIT_REPO)"
   GITHUB_PREVIEW="<span style=\"font-family: 'IBM Plex Mono', monospace;\">${COMMIT_REPO}: ${COMMIT_MESSAGE}</span>"
-  sed "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1"
-  mv "$TEMP_FILE.1" "$TEMP_FILE"
-  mv "$TEMP_FILE" "$HTML_FILE"
+  sed -i.bak "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE" && \
+    rm "$TEMP_FILE.bak"
+  if [ $? -ne 0 ]; then
+    echo "Failed to update GitHub section."
+    return 1
+  fi
   return 0
 }
 
 # Function to fetch the latest X post
 fetch_x_post() {
   echo "Fetching latest X post..."
-  # Use verbose curl for debugging and capture response
-  RESPONSE=$(curl -v -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets? thatmax_results=10&exclude=retweets&tweet.fields=text" 2> curl_debug.log)
+  RESPONSE=$(curl -v -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets?max_results=10&exclude=retweets&tweet.fields=text" 2> curl_debug.log)
   HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
-  TWEET_RESPONSE=$(echo "$RESPONSE" | sed -e '$d')  # Remove status line to get JSON
+  TWEET_RESPONSE=$(echo "$RESPONSE" | sed -e '$d')
 
-  # Check for non-200 status or invalid JSON
   if [ "$HTTP_STATUS" -ne 200 ]; then
     ERROR_TITLE=$(echo "$TWEET_RESPONSE" | jq -r '.title // .errors[0].title // "Unknown Error"')
     ERROR_DETAIL=$(echo "$TWEET_RESPONSE" | jq -r '.detail // .errors[0].detail // "No details provided"')
@@ -154,9 +149,8 @@ fetch_x_post() {
     return 1
   fi
 
-  # Check if response is empty or invalid JSON
   if [ -z "$TWEET_RESPONSE" ] || ! echo "$TWEET_RESPONSE" | jq -e . >/dev/null 2>&1; then
-    echo "Could not get latest post from X, got invalid or empty response (possible curl error)"
+    echo "Could not get latest post from X, got invalid or empty response"
     echo "Raw response: $TWEET_RESPONSE"
     echo "Curl debug log written to curl_debug.log"
     return 1
@@ -170,9 +164,7 @@ fetch_x_post() {
     return 1
   fi
 
-  # Unescape HTML entities using Python
   TWEET_TEXT_UNESCAPED=$(python3 -c "import html; print(html.unescape('$TWEET_TEXT'.replace('\0', '')))")
-  # Sanitize: remove newlines, tabs, and escape problematic characters for sed
   TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&]/\\&/g; s/"/\\"/g')
   TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-50)
   if [ ${#TWEET_TEXT_CLEAN} -gt 50 ]; then
@@ -181,14 +173,16 @@ fetch_x_post() {
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
 
-  # Use a safer sed delimiter (#)
-  sed "s#<span id=\"x-preview\">[^<]*</span>#<span id=\"x-preview\">${X_PREVIEW}</span>#g" "$TEMP_FILE" > "$TEMP_FILE.1"
-  mv "$TEMP_FILE.1" "$TEMP_FILE"
-  mv "$TEMP_FILE" "$HTML_FILE"
+  sed -i.bak "s#<span id=\"x-preview\">[^<]*</span>#<span id=\"x-preview\">${X_PREVIEW}</span>#g" "$TEMP_FILE" && \
+    rm "$TEMP_FILE.bak"
+  if [ $? -ne 0 ]; then
+    echo "Failed to update X section."
+    return 1
+  fi
   return 0
 }
 
-# Fetch all data and update HTML sections independently
+# Fetch all data and update HTML sections
 echo "Starting CTA update..."
 UPDATE_NEEDED=0
 cp "$HTML_FILE" "$TEMP_FILE"
@@ -214,8 +208,11 @@ else
   echo "X update skipped due to API failure."
 fi
 
-# Clean up temp file if no updates were successful
-if [ "$UPDATE_NEEDED" -eq 0 ]; then
+# Apply changes if at least one update was successful
+if [ "$UPDATE_NEEDED" -eq 1 ]; then
+  mv "$TEMP_FILE" "$HTML_FILE"
+  echo "Update complete! Check $HTML_FILE for changes."
+else
   echo "No API calls succeeded. HTML file not updated."
   rm -f "$TEMP_FILE"
 fi
