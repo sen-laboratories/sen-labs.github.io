@@ -29,12 +29,12 @@ jobs:
           git config --global user.email "bot@sen-labs.org"
           git config --global user.name "SEN Labs Bot"
           if [[ `git status --porcelain` ]]; then
-            # No changes
-            echo nothing changed, done.
-          else
             git add index_new.html
             git commit -m "Update CTA previews with latest content"
             git push
             echo pushed latest changes, done.
+          else
+            # No changes
+            echo nothing changed, done.
           fi
           
