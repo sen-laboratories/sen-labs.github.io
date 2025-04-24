@@ -163,7 +163,7 @@ fetch_x_post() {
 
   TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT" | cut -c 1-50)
   if [ ${#TWEET_TEXT} -gt 50 ]; then
-    TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
+    TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}…"
   fi
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
@@ -177,8 +177,9 @@ cp "$HTML_FILE" "$TEMP_FILE"
 
 if fetch_youtube_video; then
   echo "Updating YouTube section in $HTML_FILE..."
-  sed "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1"
-  mv "$TEMP_FILE.1" "$TEMP_FILE"
+  # be sure to only update when sed returns no error and the file could be written!
+  sed "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1" && \
+  mv "$TEMP_FILE.1" "$TEMP_FILE" && \
   UPDATE_NEEDED=1
 else
   echo "YouTube update skipped due to API failure."
@@ -186,8 +187,9 @@ fi
 
 if fetch_github_data; then
   echo "Updating GitHub section in $HTML_FILE..."
-  sed "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1"
-  mv "$TEMP_FILE.1" "$TEMP_FILE"
+  # be sure to only update when sed returns no error and the file could be written!
+  sed "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1" && \
+  mv "$TEMP_FILE.1" "$TEMP_FILE" && \
   UPDATE_NEEDED=1
 else
   echo "GitHub update skipped due to API failure."
@@ -195,8 +197,9 @@ fi
 
 if fetch_x_post; then
   echo "Updating X section in $HTML_FILE..."
-  sed "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1"
-  mv "$TEMP_FILE.1" "$TEMP_FILE"
+  # be sure to only update when sed returns no error and the file could be written!
+  sed "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">'${X_PREVIEW}'</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1" && \
+  mv "$TEMP_FILE.1" "$TEMP_FILE" && \
   UPDATE_NEEDED=1
 else
   echo "X update skipped due to API failure."

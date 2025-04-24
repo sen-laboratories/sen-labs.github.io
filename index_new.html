@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEN: a /home for your thoughts</title>
+  <!-- Boxicons CDN for Social Icons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <!-- IBM Plex Mono for Monospaced /home -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      background: #1A1A1A;
+      color: #F4F4F4;
+      font-family: 'Visby Regular', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    /* Neural Network Background with Particles.js */
+    .page-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+    }
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+    /* Gradient overlay for fade effect (dark to light grey at the bottom) */
+    .page-bg::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, transparent 50%, #666666 100%);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+    }
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 40px 0;
+      text-align: center;
+      background: #1A1A1A;
+    }
+    .logo {
+      width: 200px;
+      margin-bottom: 10px;
+    }
+    .hero .logo {
+      width: 520px; /* Updated size for top logo */
+    }
+    .claim {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: #78b4ff;
+    }
+    .claim .path {
+      color: #2EBFD4;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .subclaim {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 16px;
+      color: #F7F2E1;
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .btn {
+      font-family: 'Visby Bold', sans-serif;
+      padding: 10px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      cursor: pointer;
+      pointer-events: auto;
+      z-index: 3;
+    }
+    .btn-primary {
+      border: 2px solid #2EBFD4;
+      color: #2EBFD4;
+    }
+    .btn-primary:hover {
+      background: #2EBFD4;
+      color: #F4F4F4;
+      box-shadow: 0 0 12px rgba(46, 191, 212, 0.6);
+      text-decoration: underline;
+      text-decoration-color: #FF33CC;
+    }
+    .waitlist-caption {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 14px;
+      color: #F7F2E1;
+      margin-top: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .placeholder {
+      color: #F7F2E1;
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 16px;
+      padding: 20px;
+      border: 1px dashed #F7F2E1;
+      max-width: 70%;
+      margin: 40px auto 0;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .placeholder:hover,
+    .placeholder.dragging {
+      transform: translateY(-10px) scale(1.2);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+    .placeholder-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Haiku-Style Tab for Placeholders */
+    .placeholder-tab {
+      position: absolute;
+      top: -20px;
+      left: 10px;
+      width: 70px;
+      height: 20px;
+      background: linear-gradient(to bottom, #78b4ff, #5a9bff);
+      border: 1px solid #2EBFD4;
+      border-bottom: none;
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      z-index: 1;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none; /* Prevent default touch behaviors like scrolling */
+    }
+    .placeholder-tab.dragging {
+      cursor: grabbing;
+      user-select: none;
+    }
+    .placeholder-tab span {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 12px;
+      color: #F4F4F4;
+    }
+    /* Features Section */
+    .features {
+      padding: 40px 0 80px 0;
+      text-align: center;
+      background: #1A1A1A;
+    }
+    h2 {
+      font-family: 'Visby Bold', sans-serif;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .features p {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 16px;
+      color: #F7F2E1;
+      margin-bottom: 40px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    .feature-card {
+      padding: 20px;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .feature-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .feature-card h3 {
+      font-family: 'Visby Bold', sans-serif;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 15px;
+      color: #F7F2E1;
+      margin: 0;
+    }
+    /* Demo Section */
+    .demo {
+      padding: 60px 0;
+      text-align: center;
+      background: #1A1A1A;
+    }
+    .demo p {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 16px;
+      color: #F7F2E1;
+      margin-bottom: 30px;
+    }
+    .btn-demo {
+      background: #FF33CC;
+      color: #F4F4F4;
+      margin-top: 40px;
+      display: inline-block;
+      max-width: 250px;
+    }
+    .btn-demo:hover {
+      box-shadow: 0 0 12px rgba(255, 51, 204, 0.6);
+      text-decoration: underline;
+      text-decoration-color: #2EBFD4;
+    }
+    /* Connect Section (Renamed to Stay Tuned) */
+    .connect {
+      padding: 60px 0;
+      text-align: center;
+      background: #1A1A1A;
+    }
+    .connect-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    .connect-links a {
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: block;
+    }
+    .connect-links a:hover .social-card {
+      transform: translateY(-10px) scale(1.2);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+    .connect-links .social-card {
+      width: 250px; /* Increased by 25% */
+      height: 150px; /* Increased by 25% */
+      background: #222222;
+      border: 1px solid #2EBFD4;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      position: relative;
+    }
+    .connect-links .social-card .preview {
+      width: 100%;
+      height: 70%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .connect-links .social-card .preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .connect-links .social-card .preview span {
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 14px;
+      color: #F7F2E1;
+      text-align: center;
+      padding: 5px;
+    }
+    .connect-links .social-card .caption {
+      width: 100%;
+      height: 30%;
+      background: #2EBFD4;
+      color: #F4F4F4;
+      font-family: 'Visby Regular', sans-serif;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5px;
+    }
+    /* Waitlist Section */
+    .waitlist {
+      padding: 60px 0;
+      text-align: center;
+      background: #1A1A1A;
+    }
+    /* Newsletter Section */
+    .newsletter {
+      padding: 40px 0;
+      text-align: center;
+      background: #1A1A1A;
+    }
+    .newsletter .btn {
+      background: #2EBFD4;
+      color: #F4F4F4;
+    }
+    .newsletter .btn:hover {
+      box-shadow: 0 0 12px rgba(46, 191, 212, 0.6);
+      text-decoration: underline;
+      text-decoration-color: #FF33CC;
+    }
+    /* Footer */
+    .footer {
+      padding: 40px 0;
+      background: #1A1A1A;
+      text-align: center;
+    }
+    .footer .logo {
+      width: 200px; /* Updated size for footer logo */
+      margin-bottom: 20px;
+    }
+    .footer p {
+      font-family: 'Visby Light', sans-serif;
+      font-size: 14px;
+      color: #F7F2E1;
+      margin-bottom: 20px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-family: 'Visby Light', sans-serif;
+      font-size: 14px;
+      color: #F7F2E1;
+      text-decoration: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+      text-decoration-color: #2EBFD4;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .claim { font-size: 22px; }
+      .subclaim { font-size: 14px; }
+      .waitlist-caption { font-size: 12px; }
+      h2 { font-size: 22px; }
+      .placeholder { max-width: 90%; }
+      .connect-links .social-card {
+        width: 200px; /* Increased by 25% for mobile */
+        height: 125px; /* Increased by 25% for mobile */
+      }
+      .connect-links .social-card .preview span {
+        font-size: 13px;
+      }
+      .connect-links .social-card .caption {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Pattern with Particles.js -->
+  <div class="page-bg">
+    <div id="particles-js"></div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <img src="images/sen-logo.webp" alt="SEN Logo" class="logo">
+      <h1 class="claim">a <span class="path">/home</span> for your thoughts</h1>
+      <p class="subclaim">Link local files, reference data seamlessly, and manage your personal knowledge right on your desktop – all open-source and integrated into your filesystem.</p>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <h2>Why SEN?</h2>
+      <p>Your desktop, reimagined for thought.</p>
+      <div class="feature-grid">
+        <!-- Filesystem Integration -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Filesystem Integration Screenshot" class="placeholder-img">
+          </div>
+          <h3>Filesystem Integration</h3>
+          <p>> Seamlessly ties into your system.</p>
+        </div>
+        <!-- Semantic Links -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Semantic Links Screenshot" class="placeholder-img">
+          </div>
+          <h3>Semantic Links</h3>
+          <p>> Connect ideas across files.</p>
+        </div>
+        <!-- Native Relations -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Feature</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Native Relations Screenshot" class="placeholder-img">
+          </div>
+          <h3>Native Relations</h3>
+          <p>> Dynamic relations and inference.</p>
+        </div>
+        <!-- Local First -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Principle</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Local First Screenshot" class="placeholder-img">
+          </div>
+          <h3>Local First</h3>
+          <p>> Your Knowledge, Your Control</p>
+        </div>
+        <!-- Remote on Demand -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Principle</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="Remote on Demand Screenshot" class="placeholder-img">
+          </div>
+          <h3>Remote on Demand</h3>
+          <p>> Fetch open metadata when needed</p>
+        </div>
+        <!-- With SEN, you CAN -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Principle</span></div>
+            <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="No-Code Apps Screenshot" class="placeholder-img">
+          </div>
+          <h3>With SEN, you CAN</h3>
+          <p>> No-Code Power—Build Data-Driven Apps</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Section -->
+  <section class="demo">
+    <div class="container">
+      <h2>SEN in Action</h2>
+      <p>Watch SEN grow and support the vision.</p>
+      <div class="placeholder">
+        <div class="placeholder-tab" data-max-width="70%"><span>Demo</span></div>
+        <img src="images/sample-static.webp" data-animated-src="images/sample-animated.webp" alt="SEN in Action Screenshot" class="placeholder-img">
+      </div>
+      <a href="/use-cases.html" class="btn btn-demo">View More Use Cases</a>
+    </div>
+  </section>
+
+<!-- Stay Tuned Section -->
+<section class="connect">
+  <div class="container">
+    <h2>Stay Tuned</h2>
+    <p>Get the latest project updates here:</p>
+    <div class="connect-links">
+      <a href="https://github.com/sen-laboratories">
+        <div class="social-card">
+          <div class="preview">
+            <span id="github-preview"><span style="font-family: 'IBM Plex Mono', monospace;">sen-inference: rewrite for propert PEGTL usage and simplfy parsing, WIP.</span></span>
+            <img src="https://github.com/sen-laboratories/sen/workflows/CI/badge.svg" alt="GitHub Build Status">
+          </div>
+          <div class="caption">Star on GitHub</div>
+        </div>
+      </a>
+      <a href="/blog.html">
+        <div class="social-card">
+          <div class="preview">
+            <!-- BLOG_PREVIEW -->
+            <span>Latest Blog Post: "Introducing SEN v1.0"</span>
+          </div>
+          <div class="caption">Read the Blog</div>
+        </div>
+      </a>
+      <a href="https://x.com/labs_sen">
+        <div class="social-card">
+          <div class="preview">
+            <span id="x-preview"><span>Latest Post: "@jonathanstea Let's all spend a femtosecond to hon..."</span></span>
+          </div>
+          <div class="caption">Follow on X</div>
+        </div>
+      </a>
+      <a href="https://youtube.com/@sen-labs">
+        <div class="social-card">
+          <div class="preview">
+            <span id="youtube-preview">
+              <img src="https://img.youtube.com/vi/GtooRAKLCYU/0.jpg" alt="SEN Presentation at PKM Summit 2025">
+            </span>
+          </div>
+          <div class="caption">Watch on YouTube</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <!-- Waitlist Section -->
+  <section class="waitlist">
+    <div class="container">
+      <div class="cta-buttons">
+        <a href="mailto:waitlist@sen-labs.org" class="btn btn-primary" target="_blank">Join the Waitlist</a>
+      </div>
+      <p class="waitlist-caption">Be the first to try the technical preview release!</p>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter">
+    <div class="container">
+      <a href="https://sen.substack.com" class="btn">Join the Newsletter</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <img src="images/sen-logo.webp" alt="SEN Logo" class="logo">
+      <p>© 2025 SEN Labs. a <span class="path">/home</span> for your thoughts.</p>
+      <div class="footer-links">
+        <a href="https://github.com/sen-labs"><i class='bx bxl-github'></i>GitHub</a>
+        <a href="/blog.html"><i class='bx bx-book'></i>Blog</a>
+        <a href="https://x.com/sen_labs"><i class='bx bxl-twitter'></i>X</a>
+        <a href="https://youtube.com/@sen-labs"><i class='bx bxl-youtube'></i>YouTube</a>
+        <a href="https://sen.substack.com"><i class='bx bxl-substack'></i>Substack</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Particles.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    // Initialize Particles.js with More Fluid Interaction
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#333333", "#666666", "#78b4ff", "#F4F4F4"] },
+        "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" } },
+        "opacity": { "value": 0.5, "random": true, "anim": { "enable": true, "speed": 0.5, "opacity_min": 0.1, "sync": false } },
+        "size": { "value": 4, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } },
+        "line_linked": { "enable": true, "distance": 200, "color": "#666666", "opacity": 0.4, "width": 1 },
+        "move": { "enable": true, "speed": 2.0, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": true }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+          "onhover": { "enable": true, "mode": ["bubble", "repulse"] },
+          "onclick": { "enable": true, "mode": "push" },
+          "resize": true
+        },
+        "modes": {
+          "bubble": { "distance": 200, "size": 8, "duration": 0.5, "opacity": 0.7 },
+          "repulse": { "distance": 80, "duration": 0.4 },
+          "push": { "particles_nb": 4 }
+        }
+      },
+      "retina_detect": true
+    });
+
+    // Feature Cards Slide-In
+    const featureCards = document.querySelectorAll('.feature-card');
+    const observerOptions = { root: null, rootMargin: '-300px', threshold: 0.1 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    featureCards.forEach(card => observer.observe(card));
+
+    // Draggable Tabs with Touch Support
+    document.querySelectorAll('.placeholder-tab').forEach(tab => {
+      let isDragging = false;
+      let startX = 0;
+      let currentX = 10; // Initial left position
+      const initialPadding = 10; // Match the initial left position for aesthetic offset
+      const parent = tab.parentElement;
+      const scaleFactor = 1.2;
+      let baseWidth;
+
+      // Function to calculate the base width (unscaled), including padding
+      const calculateBaseWidth = () => {
+        const parentStyles = getComputedStyle(parent);
+        let width = parent.offsetWidth;
+        // Subtract borders only (not padding, as tab slides within the content box including padding)
+        width = width
+          - parseFloat(parentStyles.borderLeftWidth)
+          - parseFloat(parentStyles.borderRightWidth);
+        return Math.max(width, 0); // Ensure width is not negative
+      };
+
+      // Function to calculate the tab width, accounting for borders
+      const calculateTabWidth = () => {
+        const tabStyles = getComputedStyle(tab);
+        let width = tab.offsetWidth;
+        // Account for borders (1px on left and right)
+        width = width
+          - parseFloat(tabStyles.borderLeftWidth)
+          - parseFloat(tabStyles.borderRightWidth);
+        return Math.max(width, 0);
+      };
+
+      // Initial calculation
+      baseWidth = calculateBaseWidth();
+      let tabWidth = calculateTabWidth();
+      let scaledWidth = baseWidth * scaleFactor;
+
+      // Recalculate on window resize
+      window.addEventListener('resize', () => {
+        baseWidth = calculateBaseWidth();
+        tabWidth = calculateTabWidth();
+        scaledWidth = baseWidth * scaleFactor;
+        const maxLeft = baseWidth - tabWidth - initialPadding; // Respect initial padding on the right
+        currentX = Math.min(currentX, maxLeft);
+        currentX = Math.max(currentX, initialPadding); // Ensure it doesn't go below initial padding
+        tab.style.left = `${currentX}px`;
+      });
+
+      // Mouse Events
+      tab.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        baseWidth = calculateBaseWidth();
+        tabWidth = calculateTabWidth();
+        scaledWidth = baseWidth * scaleFactor;
+        const parentRect = parent.getBoundingClientRect();
+        // Adjust startX to account for the panel's scaled position
+        const unscaledMouseX = (e.clientX - parentRect.left) / scaleFactor;
+        startX = unscaledMouseX - currentX;
+        tab.classList.add('dragging');
+        parent.classList.add('dragging');
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+
+        const parentRect = parent.getBoundingClientRect();
+        // Convert mouse position to unscaled coordinates
+        const unscaledMouseX = (e.clientX - parentRect.left) / scaleFactor;
+        const minLeft = initialPadding; // Respect initial padding on the left
+        const maxLeft = baseWidth - tabWidth - initialPadding; // Respect initial padding on the right
+        const newLeft = Math.min(Math.max(unscaledMouseX - startX, minLeft), maxLeft);
+
+        currentX = newLeft;
+        tab.style.left = `${currentX}px`;
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        tab.classList.remove('dragging');
+      });
+
+      // Touch Events
+      tab.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        baseWidth = calculateBaseWidth();
+        tabWidth = calculateTabWidth();
+        scaledWidth = baseWidth * scaleFactor;
+        const parentRect = parent.getBoundingClientRect();
+        // Adjust startX to account for the panel's scaled position
+        const unscaledTouchX = (e.touches[0].clientX - parentRect.left) / scaleFactor;
+        startX = unscaledTouchX - currentX;
+        tab.classList.add('dragging');
+        parent.classList.add('dragging');
+      });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+
+        const parentRect = parent.getBoundingClientRect();
+        // Convert touch position to unscaled coordinates
+        const unscaledTouchX = (e.touches[0].clientX - parentRect.left) / scaleFactor;
+        const minLeft = initialPadding; // Respect initial padding on the left
+        const maxLeft = baseWidth - tabWidth - initialPadding; // Respect initial padding on the right
+        const newLeft = Math.min(Math.max(unscaledTouchX - startX, minLeft), maxLeft);
+
+        currentX = newLeft;
+        tab.style.left = `${currentX}px`;
+      });
+
+      document.addEventListener('touchend', () => {
+        isDragging = false;
+        tab.classList.remove('dragging');
+      });
+
+      parent.addEventListener('mouseleave', () => {
+        if (!isDragging) parent.classList.remove('dragging');
+      });
+
+      parent.addEventListener('touchend', () => {
+        if (!isDragging) parent.classList.remove('dragging');
+      });
+    });
+
+    // Screenshot Animation on Hover
+    document.querySelectorAll('.placeholder').forEach(placeholder => {
+      const img = placeholder.querySelector('.placeholder-img');
+      const stillSrc = img.src;
+      const animatedSrc = img.getAttribute('data-animated-src');
+
+      placeholder.addEventListener('mouseenter', () => {
+        img.src = animatedSrc;
+      });
+
+      placeholder.addEventListener('mouseleave', () => {
+        img.src = stillSrc;
+      });
+
+      // Fallback for touch devices: toggle animation on tap
+      placeholder.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (img.src === stillSrc) {
+          img.src = animatedSrc;
+        } else {
+          img.src = stillSrc;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
