@@ -198,7 +198,7 @@ fi
 if fetch_x_post; then
   echo "Updating X section in $HTML_FILE..."
   # be sure to only update when sed returns no error and the file could be written!
-  sed "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">'${X_PREVIEW}'</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1" && \
+  sed "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">\"${X_PREVIEW}\"</span>|g" "$TEMP_FILE" > "$TEMP_FILE.1" && \
   mv "$TEMP_FILE.1" "$TEMP_FILE" && \
   UPDATE_NEEDED=1
 else
