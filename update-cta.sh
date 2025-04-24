@@ -188,6 +188,7 @@ fetch_x_post() {
     echo "Failed to update X section."
     return 1
   fi
+  rm curl_debug.log
   return 0
 }
 
