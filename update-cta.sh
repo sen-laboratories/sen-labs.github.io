@@ -167,14 +167,18 @@ fetch_x_post() {
 
   # Replace newlines with spaces to prevent Python syntax errors
   TWEET_TEXT_ESCAPED=$(echo "$TWEET_TEXT" | tr '\n' ' ')
+  # Debug: Log escaped text
+  echo "Escaped tweet text: '$TWEET_TEXT_ESCAPED'"
+  # Safely quote for Python
+  TWEET_TEXT_QUOTED=$(printf '%q' "$TWEET_TEXT_ESCAPED")
   # Unescape HTML entities
-  TWEET_TEXT_UNESCAPED=$(python3 -c "import html; print(html.unescape('$TWEET_TEXT_ESCAPED'.replace('\0', '')))" 2>/dev/null)
+  TWEET_TEXT_UNESCAPED=$(python -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))")
   if [ $? -ne 0 ]; then
-    echo "Failed to unescape HTML entities in tweet."
+    echo "Failed to unescape HTML entities in tweet: '$TWEET_TEXT_QUOTED'"
     return 1
   fi
-  # Sanitize for sed
-  TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&]/\\&/g; s/"/\\"/g')
+  # Sanitize for sed, including new delimiter
+  TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&|]/\\&/g; s/"/\\"/g')
   TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-50)
   if [ ${#TWEET_TEXT_CLEAN} -gt 50 ]; then
     TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
