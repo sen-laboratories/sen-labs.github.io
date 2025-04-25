@@ -188,7 +188,6 @@ fetch_x_post() {
     echo "Failed to update X section."
     return 1
   fi
-  rm curl_debug.log
   return 0
 }
 
@@ -220,6 +219,7 @@ fi
 
 # Apply changes if at least one update was successful
 if [ "$UPDATE_NEEDED" -eq 1 ]; then
+  rm -f curl_debug.log
   mv "$TEMP_FILE" "$HTML_FILE"
   echo "Update complete! Check $HTML_FILE for changes."
 else
