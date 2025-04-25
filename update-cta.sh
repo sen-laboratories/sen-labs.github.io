@@ -169,10 +169,10 @@ fetch_x_post() {
   TWEET_TEXT_ESCAPED=$(echo "$TWEET_TEXT" | tr '\n' ' ')
   # Debug: Log escaped text
   echo "Escaped tweet text: '$TWEET_TEXT_ESCAPED'"
-  # Safely quote for Python
-  TWEET_TEXT_QUOTED=$(printf '%q' "$TWEET_TEXT_ESCAPED")
-  # Unescape HTML entities
-  TWEET_TEXT_UNESCAPED=$(python -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))")
+  # Escape single quotes for Python
+  TWEET_TEXT_QUOTED=$(echo "$TWEET_TEXT_ESCAPED" | sed "s/'/\\\'/g")
+  # Unescape HTML entities, treat warnings as errors
+  TWEET_TEXT_UNESCAPED=$(python -W error -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))")
   if [ $? -ne 0 ]; then
     echo "Failed to unescape HTML entities in tweet: '$TWEET_TEXT_QUOTED'"
     return 1
@@ -187,11 +187,13 @@ fetch_x_post() {
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
 
   sed -i.bak "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE" && \
-    rm "$TEMP_FILE.bak"
+    rm "$TEMP_FILE.bak" && \
+    rm -f curl_debug.log
   if [ $? -ne 0 ]; then
     echo "Failed to update X section."
     return 1
   fi
+  echo "X section updated."
   return 0
 }
 
