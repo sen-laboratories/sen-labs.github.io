@@ -182,7 +182,7 @@ fetch_x_post() {
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
 
-  sed -i.bak "s#<span id=\"x-preview\">[^<]*</span>#<span id=\"x-preview\">${X_PREVIEW}</span>#g" "$TEMP_FILE" && \
+  sed -i.bak "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE" && \
     rm "$TEMP_FILE.bak"
   if [ $? -ne 0 ]; then
     echo "Failed to update X section."
