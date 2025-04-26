@@ -281,6 +281,7 @@
       overflow: hidden;
       position: relative;
     }
+    
 	/* Stay Tuned Section */
 	.stay-tuned {
 	  padding: 60px 0;
@@ -320,7 +321,7 @@
 	  align-items: center;
 	  justify-content: space-between;
 	  transition: all 0.3s ease;
-	  overflow: hidden;
+	  overflow: visible; /* Ensure caption isn't clipped */
 	  position: relative;
 	}
 	
@@ -337,33 +338,37 @@
 	  display: flex;
 	  flex-direction: column;
 	  justify-content: center;
-	  align-items: center; /* Center content */
+	  align-items: center;
 	}
 	
 	/* Channel-specific backgrounds */
 	.social-card.youtube .preview {
-	  background-image: url('/assets/images/youtube-bg.png');
+	  background-image: url('assets/images/youtube-bg.png'); /* Relative path */
+	  opacity: 0.2;
 	}
 	
 	.social-card.github .preview {
-	  background-image: url('/assets/images/github-bg.png');
+	  background-image: url('assets/images/github-bg.png'); /* Relative path */
+	  opacity: 0.2;
 	}
 	
 	.social-card.x .preview {
-	  background-image: url('/assets/images/x-bg.png');
+	  background-image: url('assets/images/x-bg.png'); /* Relative path */
+	  opacity: 0.2;
 	}
 	
 	.social-card.blog .preview {
-	  background-image: url('/assets/images/rss-bg.png');
-	  background-size: 40px; /* Smaller for subtlety (was 60px) */
-	  background-color: rgba(0, 0, 0, 0.5); /* Darker tint to tone down RSS icon */
+	  background-image: url('assets/images/rss-bg.png'); /* Relative path */
+	  background-size: 40px;
+	  background-color: rgba(0, 0, 0, 0.5);
+	  opacity: 0.2;
 	}
 	
 	/* Ensure content visibility */
 	.social-card .preview span {
 	  position: relative;
-	  z-index: 2; /* Higher z-index to ensure visibility (was 1) */
-	  color: #e0e0e0;
+	  z-index: 2;
+	  color: #ffffff; /* White for prominence (was #e0e0e0) */
 	  width: 100%;
 	  text-align: center;
 	}
@@ -371,7 +376,7 @@
 	/* YouTube-specific: Ensure img doesn't obscure background */
 	.social-card.youtube .preview img {
 	  position: relative;
-	  z-index: 2; /* Above background */
+	  z-index: 2;
 	  max-width: 100%;
 	  height: auto;
 	  display: block;
@@ -395,7 +400,7 @@
 	  height: auto;
 	  margin: 0;
 	  position: relative;
-	  z-index: 2; /* Higher z-index (was 1) */
+	  z-index: 2;
 	}
 	
 	/* Caption styling */
@@ -407,6 +412,8 @@
 	  text-align: center;
 	  background: rgba(0, 0, 0, 0.5);
 	  padding: 5px 0;
+	  display: block; /* Ensure visibility */
+	  z-index: 1; /* Above any overlapping elements */
 	}
 
     /* Waitlist Section */
