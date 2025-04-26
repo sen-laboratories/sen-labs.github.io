@@ -169,7 +169,7 @@ fetch_x_post() {
   HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
   TWEET_RESPONSE=$(echo "$RESPONSE" | sed -e '$d')
 
-  if [ "$HTTP_STATUS" -ne 0 ]; then
+  if [ "$HTTP_STATUS" -ne 200 ]; then
     ERROR_TITLE=$(echo "$TWEET_RESPONSE" | jq -r '.title // .errors[0].title // "Unknown Error"')
     ERROR_DETAIL=$(echo "$TWEET_RESPONSE" | jq -r '.detail // .errors[0].detail // "No details provided"')
     echo "Could not get latest post from X, got HTTP status $HTTP_STATUS: $ERROR_TITLE, detail: $ERROR_DETAIL"
@@ -212,7 +212,7 @@ fetch_x_post() {
     TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
   fi
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
-  X_PREVIEW="Latest Post: \"${TWEET_TEXT_TRUNCATED}\""
+  X_PREVIEW="Latest: \"${TWEET_TEXT_TRUNCATED}\""
 
   echo "Before X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   grep -q "<span id=[\"']${X_PREVIEW_ID}[\"']>" "$TEMP_FILE" || { echo "Error: ${X_PREVIEW_ID} span not found in $TEMP_FILE"; return 1; }
