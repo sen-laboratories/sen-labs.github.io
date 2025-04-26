@@ -356,13 +356,12 @@ h2 {
 
 /* Sponsor button styling */
 .connect-links .social-card .sponsor {
-  margin-top: 5px;
   width: 100%;
   text-align: center;
 }
 
 .connect-links .social-card .sponsor img {
-  height: 48px;
+  height: 24px;
 }
 
 /* Caption styling */
