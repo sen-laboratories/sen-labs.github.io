@@ -225,6 +225,8 @@ fi
 
 # Apply changes if at least one update was successful
 if [ "$UPDATE_NEEDED" -eq 1 ]; then
+  #debug
+  diff $HTML_FILE $TEMP_FILE
   mv "$TEMP_FILE" "$HTML_FILE"
   echo "Update complete! Check $HTML_FILE for changes."
 else
