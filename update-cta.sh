@@ -96,64 +96,26 @@ fetch_youtube_video() {
 
 # Function to fetch the latest commit across all public repos
 fetch_github_data() {
-  echo "Fetching latest GitHub commit..."
-  AUTH_HEADER=""
-  if [ -n "$GITHUB_TOKEN" ]; then
-    AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
-  fi
-
-  REPOS_RESPONSE=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/orgs/${GITHUB_ORG}/repos?type=public&sort=updated&per_page=100")
-  REPO_NAMES=($(echo "$REPOS_RESPONSE" | jq -r '.[].name'))
-
-  if [ ${#REPO_NAMES[@]} -eq 0 ]; then
-    echo "Failed to fetch repositories."
-    return 1
-  fi
-
-  LATEST_COMMIT_DATE=""
-  COMMIT_MESSAGE=""
-  COMMIT_SHA=""
-  COMMIT_REPO=""
-
-  for REPO in "${REPO_NAMES[@]}"; do
-    if [ "$EXCLUDE_WEB_REPO" -eq 1 ] && [ "$REPO" = "sen-labs.github.io" ]; then
-      continue
-    fi
-    COMMIT_RESPONSE=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/${GITHUB_ORG}/${REPO}/commits?per_page=1")
-    COMMIT_DATE=$(echo "$COMMIT_RESPONSE" | jq -r '.[0].commit.committer.date')
-    if [ -n "$COMMIT_DATE" ] && { [ -z "$LATEST_COMMIT_DATE" ] || [ "$COMMIT_DATE" \> "$LATEST_COMMIT_DATE" ]; }; then
-      LATEST_COMMIT_DATE="$COMMIT_DATE"
-      COMMIT_MESSAGE=$(echo "$COMMIT_RESPONSE" | jq -r '.[0].commit.message')
-      COMMIT_SHA=$(echo "$COMMIT_RESPONSE" | jq -r '.[0].sha' | cut -c 1-7)
-      COMMIT_REPO="$REPO"
-    fi
-  done
-
-  if [ -z "$COMMIT_MESSAGE" ]; then
-    echo "Failed to fetch latest commit."
-    return 1
-  fi
-
-  echo "Latest GitHub commit: $COMMIT_MESSAGE (SHA: $COMMIT_SHA, Repo: $COMMIT_REPO)"
-  GITHUB_PREVIEW="${COMMIT_REPO}: ${COMMIT_MESSAGE}"
-  if ! grep -q "<span id=[\"']${GITHUB_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
-    echo "Error: ${GITHUB_PREVIEW_ID} span not found in $TEMP_FILE"
-    return 1
-  fi
-  # Replace content, preserve outer span
-  sed -i.bak "s|\(<span id=[\"']${GITHUB_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${GITHUB_PREVIEW}\2|g" "$TEMP_FILE" && \
-  # Update GitHub stars badge to match the repo of the last commit
-  sed -i "s|src=\"https://img.shields.io/github/stars/sen-laboratories/[^?]*|src=\"https://img.shields.io/github/stars/sen-laboratories/$COMMIT_REPO?style=social|g" "$TEMP_FILE" && \
-  # Update the link to point to the specific repo
-  sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
-
-  SED_STATUS=$?
-  rm -f "$TEMP_FILE.bak"
-  if [ $SED_STATUS -ne 0 ]; then
-    echo "Error: Failed to update GitHub section (sed error)."
-    return 1
-  fi
-  echo "GitHub section updated."
+	# Fetching latest GitHub commit
+	echo "Fetching latest GitHub commit..."
+	commit_info=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+	  "https://api.github.com/orgs/sen-laboratories/repos" | jq -r '.[].pushed_at |= (if . == null then "1970-01-01T00:00:00Z" else . end) | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
+	
+	COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
+	branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')
+	commit=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+	  "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch" | jq -r '.[0] | "\(.commit.message) (\(.sha | .[0:7]))"')
+	
+	# Update GitHub section: commit text
+	sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\" style=\"font-family: 'IBM Plex Mono', monospace;\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
+	
+	# Update GitHub stars badge to match the repo of the last commit
+	sed -i "s|src=\"https://img.shields.io/github/stars/sen-laboratories/[^\"]*|src=\"https://img.shields.io/github/stars/sen-laboratories/$COMMIT_REPO?style=social|g" "$TEMP_FILE"
+	
+	# Update the link to point to the specific repo
+	sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
+	
+	echo "GitHub section updated with dynamic repo stats and link."
   return 2  # Indicate update made
 }
 
