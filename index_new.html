@@ -311,7 +311,7 @@
 	
 	.stay-tuned-links .social-card {
 	  width: 250px;
-	  height: 180px;
+	  height: 200px; /* Increased to accommodate caption (was 180px) */
 	  background: #333333;
 	  border: 1px solid #2EBFD4;
 	  border-radius: 4px;
@@ -321,7 +321,7 @@
 	  align-items: center;
 	  justify-content: space-between;
 	  transition: all 0.3s ease;
-	  overflow: visible; /* Ensure caption isn't clipped */
+	  overflow: visible;
 	  position: relative;
 	}
 	
@@ -343,32 +343,32 @@
 	
 	/* Channel-specific backgrounds */
 	.social-card.youtube .preview {
-	  background-image: url('assets/images/youtube-bg.png'); /* Relative path */
+	  background-image: url('assets/images/youtube-bg.png');
 	  opacity: 0.2;
 	}
 	
 	.social-card.github .preview {
-	  background-image: url('assets/images/github-bg.png'); /* Relative path */
+	  background-image: url('assets/images/github-bg.png');
 	  opacity: 0.2;
 	}
 	
 	.social-card.x .preview {
-	  background-image: url('assets/images/x-bg.png'); /* Relative path */
+	  background-image: url('assets/images/x-bg.png');
 	  opacity: 0.2;
 	}
 	
 	.social-card.blog .preview {
-	  background-image: url('assets/images/rss-bg.png'); /* Relative path */
+	  background-image: url('assets/images/rss-bg.png');
 	  background-size: 40px;
 	  background-color: rgba(0, 0, 0, 0.5);
 	  opacity: 0.2;
 	}
 	
-	/* Ensure content visibility */
-	.social-card .preview span {
+	/* Ensure content visibility with higher specificity */
+	.stay-tuned-links .social-card .preview span {
 	  position: relative;
 	  z-index: 2;
-	  color: #ffffff; /* White for prominence (was #e0e0e0) */
+	  color: #ffffff !important; /* Force white, override any conflicting styles */
 	  width: 100%;
 	  text-align: center;
 	}
@@ -403,17 +403,18 @@
 	  z-index: 2;
 	}
 	
-	/* Caption styling */
-	.social-card .caption {
+	/* Caption styling with higher specificity */
+	.stay-tuned-links .social-card .caption {
 	  font-size: 14px;
-	  color: #999;
-	  margin: 10px 0;
+	  color: #999 !important; /* Ensure caption color is visible */
+	  margin: 5px 0; /* Reduced margin to fit within height */
 	  width: 100%;
 	  text-align: center;
 	  background: rgba(0, 0, 0, 0.5);
 	  padding: 5px 0;
-	  display: block; /* Ensure visibility */
-	  z-index: 1; /* Above any overlapping elements */
+	  display: block;
+	  z-index: 1;
+	  line-height: 1.5; /* Improve readability */
 	}
 
     /* Waitlist Section */
