@@ -78,22 +78,17 @@ fetch_youtube_video() {
 
   echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
   YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\">"
-  echo "Before YouTube sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
-  grep -q "<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"']>" "$TEMP_FILE" || { echo "Error: ${YOUTUBE_PREVIEW_ID} span not found in $TEMP_FILE"; return 1; }
-  BEFORE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+  if ! grep -q "<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
+    echo "Error: ${YOUTUBE_PREVIEW_ID} span not found in $TEMP_FILE"
+    return 1
+  fi
   # Replace content, preserve outer span
   sed -i.bak "s|\(<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${YOUTUBE_PREVIEW}\2|g" "$TEMP_FILE"
   SED_STATUS=$?
-  AFTER_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
   rm -f "$TEMP_FILE.bak"
-  echo "After YouTube sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   if [ $SED_STATUS -ne 0 ]; then
     echo "Error: Failed to update YouTube section (sed error)."
     return 1
-  fi
-  if [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
-    echo "No update needed for YouTube section (content unchanged)."
-    return 0
   fi
   echo "YouTube section updated."
   return 2  # Indicate update made
@@ -141,22 +136,17 @@ fetch_github_data() {
 
   echo "Latest GitHub commit: $COMMIT_MESSAGE (SHA: $COMMIT_SHA, Repo: $COMMIT_REPO)"
   GITHUB_PREVIEW="${COMMIT_REPO}: ${COMMIT_MESSAGE}"
-  echo "Before GitHub sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
-  grep -q "<span id=[\"']${GITHUB_PREVIEW_ID}[\"']>" "$TEMP_FILE" || { echo "Error: ${GITHUB_PREVIEW_ID} span not found in $TEMP_FILE"; return 1; }
-  BEFORE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+  if ! grep -q "<span id=[\"']${GITHUB_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
+    echo "Error: ${GITHUB_PREVIEW_ID} span not found in $TEMP_FILE"
+    return 1
+  fi
   # Replace content, preserve outer span
   sed -i.bak "s|\(<span id=[\"']${GITHUB_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${GITHUB_PREVIEW}\2|g" "$TEMP_FILE"
   SED_STATUS=$?
-  AFTER_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
   rm -f "$TEMP_FILE.bak"
-  echo "After GitHub sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   if [ $SED_STATUS -ne 0 ]; then
     echo "Error: Failed to update GitHub section (sed error)."
     return 1
-  fi
-  if [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
-    echo "No update needed for GitHub section (content unchanged)."
-    return 0
   fi
   echo "GitHub section updated."
   return 2  # Indicate update made
@@ -165,7 +155,7 @@ fetch_github_data() {
 # Function to fetch the latest X post
 fetch_x_post() {
   echo "Fetching latest X post..."
-  RESPONSE=$(curl -v -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets?max_results=10&exclude=retweets&tweet.fields=text" 2> curl_debug.log)
+  RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets?max_results=10&exclude=retweets&tweet.fields=text")
   HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
   TWEET_RESPONSE=$(echo "$RESPONSE" | sed -e '$d')
 
@@ -174,14 +164,12 @@ fetch_x_post() {
     ERROR_DETAIL=$(echo "$TWEET_RESPONSE" | jq -r '.detail // .errors[0].detail // "No details provided"')
     echo "Could not get latest post from X, got HTTP status $HTTP_STATUS: $ERROR_TITLE, detail: $ERROR_DETAIL"
     echo "Raw response: $TWEET_RESPONSE"
-    echo "Curl debug log written to curl_debug.log"
     return 1
   fi
 
   if [ -z "$TWEET_RESPONSE" ] || ! echo "$TWEET_RESPONSE" | jq -e . >/dev/null 2>&1; then
     echo "Could not get latest post from X, got invalid or empty response"
     echo "Raw response: $TWEET_RESPONSE"
-    echo "Curl debug log written to curl_debug.log"
     return 1
   fi
 
@@ -195,41 +183,33 @@ fetch_x_post() {
 
   # Replace newlines with spaces to prevent Python syntax errors
   TWEET_TEXT_ESCAPED=$(echo "$TWEET_TEXT" | tr '\n' ' ')
-  # Debug: Log escaped text
-  echo "Escaped tweet text: '$TWEET_TEXT_ESCAPED'"
   # Escape single quotes for Python
   TWEET_TEXT_QUOTED=$(echo "$TWEET_TEXT_ESCAPED" | sed "s/'/\\\'/g")
   # Unescape HTML entities, treat warnings as errors
-  TWEET_TEXT_UNESCAPED=$(python -W error -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))")
+  TWEET_TEXT_UNESCAPED=$(python -W error -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))" 2>/dev/null)
   if [ $? -ne 0 ]; then
     echo "Failed to unescape HTML entities in tweet: '$TWEET_TEXT_QUOTED'"
     return 1
   fi
-  # Sanitize for sed, including new delimiter
-  TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&|]/\\&/g; s/"/\\"/g')
+  # Sanitize for sed
+  TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&]/\\&/g; s/"/\\"/g')
   TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-50)
   if [ ${#TWEET_TEXT_CLEAN} -gt 50 ]; then
     TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
   fi
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
   X_PREVIEW="Latest: \"${TWEET_TEXT_TRUNCATED}\""
-
-  echo "Before X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
-  grep -q "<span id=[\"']${X_PREVIEW_ID}[\"']>" "$TEMP_FILE" || { echo "Error: ${X_PREVIEW_ID} span not found in $TEMP_FILE"; return 1; }
-  BEFORE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+  if ! grep -q "<span id=[\"']${X_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
+    echo "Error: ${X_PREVIEW_ID} span not found in $TEMP_FILE"
+    return 1
+  fi
   # Replace content, preserve outer span
   sed -i.bak "s|\(<span id=[\"']${X_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${X_PREVIEW}\2|g" "$TEMP_FILE"
   SED_STATUS=$?
-  AFTER_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
-  rm -f "$TEMP_FILE.bak" && rm -f curl_debug.log
-  echo "After X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  rm -f "$TEMP_FILE.bak"
   if [ $SED_STATUS -ne 0 ]; then
     echo "Error: Failed to update X section (sed error)."
     return 1
-  fi
-  if [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
-    echo "No update needed for X section (content unchanged)."
-    return 0
   fi
   echo "X section updated."
   return 2  # Indicate update made
@@ -247,7 +227,7 @@ YOUTUBE_STATUS=$?
 if [ $YOUTUBE_STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
 elif [ $YOUTUBE_STATUS -eq 1 ]; then
-  echo "YouTube update skipped due to API failure."
+  echo "YouTube update skipped due to API failure or missing span."
 fi
 
 fetch_github_data
@@ -255,7 +235,7 @@ GITHUB_STATUS=$?
 if [ $GITHUB_STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
 elif [ $GITHUB_STATUS -eq 1 ]; then
-  echo "GitHub update skipped due to API failure."
+  echo "GitHub update skipped due to API failure or missing span."
 fi
 
 fetch_x_post
@@ -263,15 +243,13 @@ X_STATUS=$?
 if [ $X_STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
 elif [ $X_STATUS -eq 1 ]; then
-  echo "X update skipped due to API failure."
+  echo "X update skipped due to API failure or missing span."
 fi
 
 # Apply changes if at least one update was successful
 if [ "$UPDATE_NEEDED" -eq 1 ]; then
-  echo "Before mv: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   mv -f "$TEMP_FILE" "$HTML_FILE" || { echo "Error: Failed to move $TEMP_FILE to $HTML_FILE"; exit 1; }
   sync
-  echo "After mv: $(sha256sum "$HTML_FILE" || echo 'no file')"
   echo "Update complete! Check $HTML_FILE for changes."
 else
   echo "No updates needed for $HTML_FILE (content already up-to-date)."
