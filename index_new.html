@@ -243,7 +243,7 @@
       text-decoration: underline;
       text-decoration-color: #2EBFD4;
     }
-    /* Connect Section (Renamed to Stay Tuned) */
+	/* Stay Tuned Section */
     .connect {
       padding: 60px 0;
       text-align: center;
@@ -281,38 +281,134 @@
       overflow: hidden;
       position: relative;
     }
-    .connect-links .social-card .preview {
-      width: 100%;
-      height: 70%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .connect-links .social-card .preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .connect-links .social-card .preview span {
-      font-family: 'Visby Regular', sans-serif;
-      font-size: 14px;
-      color: #F7F2E1;
-      text-align: center;
-      padding: 5px;
-    }
-    .connect-links .social-card .caption {
-      width: 100%;
-      height: 30%;
-      background: #2EBFD4;
-      color: #F4F4F4;
-      font-family: 'Visby Regular', sans-serif;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 5px;
-    }
+	/* Stay Tuned Section */
+	.stay-tuned {
+	  padding: 60px 0;
+	  text-align: center;
+	  background: #1A1A1A;
+	}
+	
+	.stay-tuned-links {
+	  display: flex;
+	  justify-content: center;
+	  gap: 20px;
+	  flex-wrap: wrap;
+	  margin-top: 30px;
+	}
+	
+	.stay-tuned-links a {
+	  text-decoration: none;
+	  transition: all 0.3s ease;
+	  cursor: pointer;
+	  display: block;
+	}
+	
+	.stay-tuned-links a:hover .social-card {
+	  transform: translateY(-10px) scale(1.2);
+	  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+	}
+	
+	.stay-tuned-links .social-card {
+	  width: 250px;
+	  height: 180px;
+	  background: #333333;
+	  border: 1px solid #2EBFD4;
+	  border-radius: 4px;
+	  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	  justify-content: space-between;
+	  transition: all 0.3s ease;
+	  overflow: hidden;
+	  position: relative;
+	}
+	
+	/* Social card layout */
+	.social-card .preview {
+	  position: relative;
+	  padding: 15px;
+	  background-size: 60px;
+	  background-repeat: no-repeat;
+	  background-position: center;
+	  background-color: rgba(0, 0, 0, 0.3);
+	  width: 100%;
+	  flex-grow: 1;
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: center;
+	  align-items: center; /* Center content */
+	}
+	
+	/* Channel-specific backgrounds */
+	.social-card.youtube .preview {
+	  background-image: url('/assets/images/youtube-bg.png');
+	}
+	
+	.social-card.github .preview {
+	  background-image: url('/assets/images/github-bg.png');
+	}
+	
+	.social-card.x .preview {
+	  background-image: url('/assets/images/x-bg.png');
+	}
+	
+	.social-card.blog .preview {
+	  background-image: url('/assets/images/rss-bg.png');
+	  background-size: 40px; /* Smaller for subtlety (was 60px) */
+	  background-color: rgba(0, 0, 0, 0.5); /* Darker tint to tone down RSS icon */
+	}
+	
+	/* Ensure content visibility */
+	.social-card .preview span {
+	  position: relative;
+	  z-index: 2; /* Higher z-index to ensure visibility (was 1) */
+	  color: #e0e0e0;
+	  width: 100%;
+	  text-align: center;
+	}
+	
+	/* YouTube-specific: Ensure img doesn't obscure background */
+	.social-card.youtube .preview img {
+	  position: relative;
+	  z-index: 2; /* Above background */
+	  max-width: 100%;
+	  height: auto;
+	  display: block;
+	  margin: 0 auto;
+	}
+	
+	/* GitHub-specific preview layout */
+	.social-card.github .preview {
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	  gap: 8px;
+	  justify-content: center;
+	  padding: 10px;
+	}
+	
+	/* GitHub badge */
+	.social-card.github .badge {
+	  display: block;
+	  width: 70px;
+	  height: auto;
+	  margin: 0;
+	  position: relative;
+	  z-index: 2; /* Higher z-index (was 1) */
+	}
+	
+	/* Caption styling */
+	.social-card .caption {
+	  font-size: 14px;
+	  color: #999;
+	  margin: 10px 0;
+	  width: 100%;
+	  text-align: center;
+	  background: rgba(0, 0, 0, 0.5);
+	  padding: 5px 0;
+	}
+
     /* Waitlist Section */
     .waitlist {
       padding: 60px 0;
@@ -482,49 +578,51 @@
     </div>
   </section>
 
-<!-- Stay Tuned Section -->
-<section class="connect">
-  <div class="container">
-    <h2>Stay Tuned</h2>
-    <p>Get the latest project updates here:</p>
-    <div class="connect-links">
-      <a href="https://github.com/sen-laboratories">
-        <div class="social-card">
-          <div class="preview">
-            <span id="github-preview" style="font-family: 'IBM Plex Mono', monospace;">sen-inference: add location example</span>
-            <img src="https://github.com/sen-laboratories/sen/workflows/CI/badge.svg" alt="GitHub Build Status">
-          </div>
-          <div class="caption">Star on GitHub</div>
-        </div>
-      </a>
-      <a href="/blog.html">
-        <div class="social-card">
-          <div class="preview">
-            <!-- BLOG_PREVIEW -->
-            <span id="blog-preview">Latest Blog Post: "Introducing SEN v1.0"</span>
-          </div>
-          <div class="caption">Read the Blog</div>
-        </div>
-      </a>
-      <a href="https://x.com/labs_sen">
-        <div class="social-card">
-          <div class="preview">
-            <span id="x-preview">Latest: "@ednico_ It's my first frontend collaboration with..."</span>
-          </div>
-          <div class="caption">Follow on X</div>
-        </div>
-      </a>
-      <a href="https://youtube.com/@sen-labs">
-        <div class="social-card">
-          <div class="preview">
-            <span id="youtube-preview"><img src="https://img.youtube.com/vi/GtooRAKLCYU/0.jpg" alt="SEN Presentation at PKM Summit 2025"></span>
-          </div>
-          <div class="caption">Watch on YouTube</div>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
+	<!-- Stay Tuned Section -->
+	<section class="connect">
+	  <div class="container">
+	    <h2>Stay Tuned</h2>
+	    <p>Get the latest project updates here:</p>
+	    <div class="connect-links">
+			<!-- X -->
+			<a href="https://x.com/labs_sen">
+			  <div class="social-card x">
+			    <div class="preview">
+			      <span id="x-preview">Latest: "@ednico_ It's my first frontend collaboration with..."</span>
+			    </div>
+			    <div class="caption">Follow on X</div>
+			  </div>
+			</a>
+			<!-- Blog (Static) -->
+			<a href="https://sen-labs.org/blog">
+			  <div class="social-card blog">
+			    <div class="preview">
+			      <span id="blog-preview">Latest Post: "Introducing SEN Labs"</span>
+			    </div>
+			    <div class="caption">Read our Blog</div>
+			  </div>
+			</a>
+			<!-- YouTube -->
+			<a href="https://www.youtube.com/channel/UCRR013YJAj1i4qM_KYciNaw">
+			  <div class="social-card youtube">
+			    <div class="preview">
+			      <span id="youtube-preview"><img src="https://img.youtube.com/vi/GtooRAKLCYU/0.jpg" alt="SEN Presentation at PKM Summit 2025"></span>
+			    </div>
+			    <div class="caption">Watch on YouTube</div>
+			  </div>
+			</a>
+			<!-- GitHub -->
+			<a href="https://github.com/sen-laboratories">
+			  <div class="social-card github">
+			    <div class="preview">
+			      <span id="github-preview" style="font-family: 'IBM Plex Mono', monospace;">sen-inference: add location example</span>
+			      <img class="badge" src="https://img.shields.io/github/stars/sen-laboratories/sen-inference?style=social" alt="GitHub Stars">
+			    </div>
+			    <div class="caption">View on GitHub</div>
+			  </div>
+			</a>
+	  </div>
+	</section>
 
   <!-- Waitlist Section -->
   <section class="waitlist">
