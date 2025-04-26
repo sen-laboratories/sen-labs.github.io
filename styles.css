@@ -231,139 +231,136 @@ h2 {
   text-decoration: underline;
   text-decoration-color: #2EBFD4;
 }
-/* Stay Tuned Section */
-.stay-tuned {
-	padding: 60px 0;
-	text-align: center;
-	background: #1A1A1A;
+
+/* Connect Section (Stay Tuned) */
+.connect {
+  padding: 60px 0;
+  text-align: center;
+  background: #1A1A1A;
 }
 
-.stay-tuned-links {
-	display: flex;
-	justify-content: center;
-	gap: 20px;
-	flex-wrap: wrap;
-	margin-top: 30px;
+.connect-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
 }
 
-.stay-tuned-links a {
-	text-decoration: none;
-	transition: all 0.3s ease;
-	cursor: pointer;
-	display: block;
+.connect-links a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: block;
 }
 
-.stay-tuned-links a:hover .social-card {
-	transform: translateY(-10px) scale(1.2);
-	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+.connect-links a:hover .social-card {
+  transform: translateY(-5px); /* Subtle lift on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Softer shadow */
+  opacity: 1.0;
 }
 
-.stay-tuned-links .social-card {
-	width: 250px;
-	height: 200px;
-	background: #333333;
-	border: 1px solid #2EBFD4;
-	border-radius: 4px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: space-between;
-	transition: all 0.3s ease;
-	overflow: visible;
-	position: relative;
+.connect-links .social-card {
+  width: 250px;
+  height: 180px; /* Adjusted for new layout */
+  background: #fefefe; /* White background like Firefox cards */
+  opacity: 0.48;
+  border: 1px solid #e0e0e0; /* Light border */
+  border-radius: 8px; /* Softer corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align content to the left */
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 10px;
 }
 
-/* Social card layout */
+/* Preview area (content) */
 .social-card .preview {
-	position: relative;
-	padding: 15px;
-	background-size: 60px;
-	background-repeat: no-repeat;
-	background-position: center;
-	background-color: rgba(0, 0, 0, 0.3);
-	width: 100%;
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px;
 }
 
-/* Channel-specific backgrounds */
-	.social-card.youtube .preview {
-	background-image: url('assets/images/youtube-bg.png');
-	opacity: 0.2;
+/* Channel-specific icons in top-right corner */
+.social-card::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
-.social-card.github .preview {
-	background-image: url('assets/images/github-bg.png');
-	opacity: 0.2;
+.social-card.youtube::after {
+  background-image: url('assets/images/youtube-icon.svg');
 }
 
-.social-card.x .preview {
-	background-image: url('assets/images/x-bg.png');
-	opacity: 0.2;
+.social-card.github::after {
+  background-image: url('assets/images/github-icon.png');
 }
 
-.social-card.blog .preview {
-	background-image: url('assets/images/rss-bg.png');
-	background-size: 40px;
-	background-color: rgba(0, 0, 0, 0.5);
-	opacity: 0.2;
+.social-card.x::after {
+  background-image: url('assets/images/x-icon.png');
 }
 
-/* Ensure content visibility with higher specificity */
-	.stay-tuned-links .social-card .preview span {
-	position: relative;
-	z-index: 2;
-	color: #ffffff !important;
-	width: 100%;
-	text-align: center;
+.social-card.blog::after {
+  background-image: url('assets/images/rss-icon.png');
 }
 
-/* YouTube-specific: Ensure img doesn't obscure background */
+/* Content styling */
+.connect-links .social-card .preview span {
+  color: #000000; /* Black text for contrast on white background */
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* YouTube-specific: Style the thumbnail */
 .social-card.youtube .preview img {
-	position: relative;
-	z-index: 2;
-	max-width: 75%;
-	height: auto;
-	display: block;
-	margin: 0 auto;
+  max-width: 90%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+  text-align: center;
 }
 
-/* GitHub-specific preview layout */
+/* GitHub-specific: Stack commit and badge */
 .social-card.github .preview {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	justify-content: center;
-	padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  justify-content: center;
 }
 
 /* GitHub badge */
 .social-card.github .badge {
-	display: block;
-	width: 70px;
-	height: auto;
-	margin: 0;
-	position: relative;
-	z-index: 2;
+  display: block;
+  width: 70px;
+  height: auto;
+  margin: 0;
 }
 
-/* Caption styling with higher specificity */
-.stay-tuned-links .social-card .caption {
-	font-size: 14px;
-	color: #999 !important;
-	margin: 5px 0;
-	width: 100%;
-	text-align: center;
-	background: rgba(0, 0, 0, 0.5);
-	padding: 5px 0;
-	display: block;
-	z-index: 1;
-	line-height: 1.5;
+/* Caption styling */
+.connect-links .social-card .caption {
+  font-size: 14px;
+  color: #555555; /* Darker grey for contrast on white */
+  margin: 5px 0;
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+  display: block;
+  line-height: 1.5;
 }
 
 /* Waitlist Section */
