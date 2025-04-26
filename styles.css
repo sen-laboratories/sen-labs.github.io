@@ -354,6 +354,17 @@ h2 {
   margin: 0;
 }
 
+/* Sponsor button styling */
+.connect-links .social-card .sponsor {
+  margin-top: 5px;
+  width: 100%;
+  text-align: center;
+}
+
+.connect-links .social-card .sponsor img {
+  height: 48px;
+}
+
 /* Caption styling */
 .connect-links .social-card .caption {
   font-size: 14px;

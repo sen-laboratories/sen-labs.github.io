@@ -141,7 +141,12 @@ fetch_github_data() {
     return 1
   fi
   # Replace content, preserve outer span
-  sed -i.bak "s|\(<span id=[\"']${GITHUB_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${GITHUB_PREVIEW}\2|g" "$TEMP_FILE"
+  sed -i.bak "s|\(<span id=[\"']${GITHUB_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${GITHUB_PREVIEW}\2|g" "$TEMP_FILE" && \
+  # Update GitHub stars badge to match the repo of the last commit
+  sed -i "s|src=\"https://img.shields.io/github/stars/sen-laboratories/[^?]*|src=\"https://img.shields.io/github/stars/sen-laboratories/$COMMIT_REPO?style=social|g" "$TEMP_FILE" && \
+  # Update the link to point to the specific repo
+  sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
+
   SED_STATUS=$?
   rm -f "$TEMP_FILE.bak"
   if [ $SED_STATUS -ne 0 ]; then
