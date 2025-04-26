@@ -19,10 +19,11 @@ jobs:
         run: |
           chmod +x update-cta.sh
           echo "Before update: $(sha256sum index_new.html || echo 'no file')"
+          grep 'x-preview' index_new.html || echo "No x-preview found in index_new.html"
           ./update-cta.sh --exclude-web-repo
           echo "After update: $(sha256sum index_new.html || echo 'no file')"
-          sed -i 's/\r$//' index_new.html  # Ensure LF
-          sync  # Ensure file system sync
+          sed -i 's/\r$//' index_new.html
+          sync
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
@@ -31,8 +32,8 @@ jobs:
         run: |
           git config --global user.email "bot@sen-labs.org"
           git config --global user.name "SEN Labs Bot"
-          pwd  # Log working directory
-          ls -la index_new.html  # Log file metadata
+          pwd
+          ls -la index_new.html
           git add --force index_new.html
           git update-index --refresh
           echo "Git status --porcelain output:"
@@ -46,6 +47,6 @@ jobs:
             echo "pushed latest changes, done."
           else
             echo "nothing changed, done."
-            git diff HEAD index_new.html  # Show uncommitted changes
+            git diff HEAD index_new.html
           fi
           

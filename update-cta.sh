@@ -74,12 +74,19 @@ fetch_youtube_video() {
   echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
   YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\">"
   echo "Before YouTube sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
-  sed -i.bak "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE"
+  grep -q '<span id=["'\'']youtube-preview["'\'']>' "$TEMP_FILE" || { echo "Error: youtube-preview span not found in $TEMP_FILE"; return 1; }
+  BEFORE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+  sed -i.bak "s|<span id=[\"']youtube-preview[\"'][^>]*>[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE"
   SED_STATUS=$?
+  AFTER_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
   rm -f "$TEMP_FILE.bak"
   echo "After YouTube sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   if [ $SED_STATUS -ne 0 ]; then
     echo "Failed to update YouTube section (sed error)."
+    return 1
+  fi
+  if [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
+    echo "Failed to update YouTube section (no changes made)."
     return 1
   fi
   echo "YouTube section updated."
@@ -129,12 +136,19 @@ fetch_github_data() {
   echo "Latest GitHub commit: $COMMIT_MESSAGE (SHA: $COMMIT_SHA, Repo: $COMMIT_REPO)"
   GITHUB_PREVIEW="<span style=\"font-family: 'IBM Plex Mono', monospace;\">${COMMIT_REPO}: ${COMMIT_MESSAGE}</span>"
   echo "Before GitHub sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
-  sed -i.bak "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE"
+  grep -q '<span id=["'\'']github-preview["'\'']>' "$TEMP_FILE" || { echo "Error: github-preview span not found in $TEMP_FILE"; return 1; }
+  BEFORE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+  sed -i.bak "s|<span id=[\"']github-preview[\"'][^>]*>[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE"
   SED_STATUS=$?
+  AFTER_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
   rm -f "$TEMP_FILE.bak"
   echo "After GitHub sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   if [ $SED_STATUS -ne 0 ]; then
     echo "Failed to update GitHub section (sed error)."
+    return 1
+  fi
+  if [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
+    echo "Failed to update GitHub section (no changes made)."
     return 1
   fi
   echo "GitHub section updated."
@@ -194,12 +208,19 @@ fetch_x_post() {
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
 
   echo "Before X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
-  sed -i.bak "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE"
+  grep -q '<span id=["'\'']x-preview["'\'']>' "$TEMP_FILE" || { echo "Error: x-preview span not found in $TEMP_FILE"; return 1; }
+  BEFORE_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
+  sed -i.bak "s|<span id=[\"']x-preview[\"'][^>]*>[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE"
   SED_STATUS=$?
+  AFTER_HASH=$(sha256sum "$TEMP_FILE" | cut -d' ' -f1)
   rm -f "$TEMP_FILE.bak" && rm -f curl_debug.log
   echo "After X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   if [ $SED_STATUS -ne 0 ]; then
     echo "Failed to update X section (sed error)."
+    return 1
+  fi
+  if [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
+    echo "Failed to update X section (no changes made)."
     return 1
   fi
   echo "X section updated."
@@ -210,6 +231,8 @@ fetch_x_post() {
 echo "Starting CTA update..."
 UPDATE_NEEDED=0
 cp "$HTML_FILE" "$TEMP_FILE" || { echo "Failed to copy $HTML_FILE to $TEMP_FILE"; exit 1; }
+echo "Initial TEMP_FILE content (x-preview):"
+grep 'x-preview' "$TEMP_FILE" || echo "No x-preview found"
 
 if fetch_youtube_video; then
   UPDATE_NEEDED=1
@@ -233,7 +256,7 @@ fi
 if [ "$UPDATE_NEEDED" -eq 1 ]; then
   echo "Before mv: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   mv -f "$TEMP_FILE" "$HTML_FILE" || { echo "Failed to move $TEMP_FILE to $HTML_FILE"; exit 1; }
-  sync  # Ensure file system sync
+  sync
   echo "After mv: $(sha256sum "$HTML_FILE" || echo 'no file')"
   echo "Update complete! Check $HTML_FILE for changes."
 else
