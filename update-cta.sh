@@ -73,12 +73,16 @@ fetch_youtube_video() {
 
   echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
   YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\">"
-  sed -i.bak "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE" && \
-    rm "$TEMP_FILE.bak"
-  if [ $? -ne 0 ]; then
-    echo "Failed to update YouTube section."
+  echo "Before YouTube sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  sed -i.bak "s|<span id=\"youtube-preview\">[^<]*</span>|<span id=\"youtube-preview\">${YOUTUBE_PREVIEW}</span>|g" "$TEMP_FILE"
+  SED_STATUS=$?
+  rm -f "$TEMP_FILE.bak"
+  echo "After YouTube sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  if [ $SED_STATUS -ne 0 ]; then
+    echo "Failed to update YouTube section (sed error)."
     return 1
   fi
+  echo "YouTube section updated."
   return 0
 }
 
@@ -124,12 +128,16 @@ fetch_github_data() {
 
   echo "Latest GitHub commit: $COMMIT_MESSAGE (SHA: $COMMIT_SHA, Repo: $COMMIT_REPO)"
   GITHUB_PREVIEW="<span style=\"font-family: 'IBM Plex Mono', monospace;\">${COMMIT_REPO}: ${COMMIT_MESSAGE}</span>"
-  sed -i.bak "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE" && \
-    rm "$TEMP_FILE.bak"
-  if [ $? -ne 0 ]; then
-    echo "Failed to update GitHub section."
+  echo "Before GitHub sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  sed -i.bak "s|<span id=\"github-preview\">[^<]*</span>|<span id=\"github-preview\">${GITHUB_PREVIEW}</span>|g" "$TEMP_FILE"
+  SED_STATUS=$?
+  rm -f "$TEMP_FILE.bak"
+  echo "After GitHub sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  if [ $SED_STATUS -ne 0 ]; then
+    echo "Failed to update GitHub section (sed error)."
     return 1
   fi
+  echo "GitHub section updated."
   return 0
 }
 
@@ -185,15 +193,15 @@ fetch_x_post() {
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
 
+  echo "Before X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
   sed -i.bak "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE"
-  if [ $? -ne 0 ]; then
-    echo "Failed to update X section."
+  SED_STATUS=$?
+  rm -f "$TEMP_FILE.bak" && rm -f curl_debug.log
+  echo "After X sed: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  if [ $SED_STATUS -ne 0 ]; then
+    echo "Failed to update X section (sed error)."
     return 1
   fi
-  
-  rm "$TEMP_FILE.bak"
-  rm -f curl_debug.log
-
   echo "X section updated."
   return 0
 }
@@ -201,17 +209,15 @@ fetch_x_post() {
 # Fetch all data and update HTML sections
 echo "Starting CTA update..."
 UPDATE_NEEDED=0
-cp "$HTML_FILE" "$TEMP_FILE"
+cp "$HTML_FILE" "$TEMP_FILE" || { echo "Failed to copy $HTML_FILE to $TEMP_FILE"; exit 1; }
 
 if fetch_youtube_video; then
-  echo "YouTube section updated."
   UPDATE_NEEDED=1
 else
   echo "YouTube update skipped due to API failure."
 fi
 
 if fetch_github_data; then
-  echo "GitHub section updated."
   UPDATE_NEEDED=1
 else
   echo "GitHub update skipped due to API failure."
@@ -225,9 +231,10 @@ fi
 
 # Apply changes if at least one update was successful
 if [ "$UPDATE_NEEDED" -eq 1 ]; then
-  #debug
-  diff $HTML_FILE $TEMP_FILE
-  mv "$TEMP_FILE" "$HTML_FILE"
+  echo "Before mv: $(sha256sum "$TEMP_FILE" || echo 'no file')"
+  mv -f "$TEMP_FILE" "$HTML_FILE" || { echo "Failed to move $TEMP_FILE to $HTML_FILE"; exit 1; }
+  sync  # Ensure file system sync
+  echo "After mv: $(sha256sum "$HTML_FILE" || echo 'no file')"
   echo "Update complete! Check $HTML_FILE for changes."
 else
   echo "No API calls succeeded. HTML file not updated."

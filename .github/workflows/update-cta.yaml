@@ -1,57 +1,51 @@
-name: Update CTA Previews
-
+name: Update CTA Section
 on:
   schedule:
-    - cron: '0 1 * * *'   # Runs daily at 1am UTC
-  workflow_dispatch:      # Allows manual triggering
-
+    - cron: '0 1 * * *'  # Runs at 1am UTC
+  push:
+    branches: [ main ]
 jobs:
   update-cta:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug Python
-        run: |
-          which python
-          which python3
-          python --version
-          python3 --version
-          
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up jq
+      - uses: actions/checkout@v4
+      - name: Set up environment
         run: sudo apt-get install jq
-
+      - name: Configure Git
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - name: Run update script
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
-          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
           chmod +x update-cta.sh
           echo "Before update: $(sha256sum index_new.html || echo 'no file')"
           ./update-cta.sh --exclude-web-repo
           echo "After update: $(sha256sum index_new.html || echo 'no file')"
           sed -i 's/\r$//' index_new.html  # Ensure LF
-          
-      - name: Commit and push changes
+          sync  # Ensure file system sync
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+      - name: Commit changes
         run: |
           git config --global user.email "bot@sen-labs.org"
           git config --global user.name "SEN Labs Bot"
           pwd  # Log working directory
           ls -la index_new.html  # Log file metadata
-          git add index_new.html
+          git add --force index_new.html
           git update-index --refresh
           echo "Git status --porcelain output:"
           git status --porcelain
           echo "Git diff --staged:"
           git diff --staged
+          echo "Git add exit status: $?"
           if [[ `git status --porcelain` ]]; then
             git commit -m "Update CTA previews with latest content"
             git push
-            echo pushed latest changes, done.
+            echo "pushed latest changes, done."
           else
-            # No changes
-            echo nothing changed, done.
+            echo "nothing changed, done."
+            git diff HEAD index_new.html  # Show uncommitted changes
           fi
           
