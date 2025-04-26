@@ -34,6 +34,11 @@ jobs:
       - name: Commit and push changes
         run: |
           git add index_new.html
+          git update-index --refresh
+          echo "Git status --porcelain output:"
+          git status --porcelain
+          echo "Git diff --staged:"
+          git diff --staged
           if [[ `git status --porcelain` ]]; then
             git config --global user.email "bot@sen-labs.org"
             git config --global user.name "SEN Labs Bot"

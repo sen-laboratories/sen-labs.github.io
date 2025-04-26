@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Configuration
@@ -42,8 +41,8 @@ if ! command -v curl &> /dev/null; then
   echo "Error: curl is required but not installed."
   exit 1
 fi
-if ! command -v python3 &> /dev/null; then
-  echo "Error: python3 is required for HTML entity unescaping."
+if ! command -v python &> /dev/null; then
+  echo "Error: python is required for HTML entity unescaping."
   exit 1
 fi
 
@@ -186,13 +185,15 @@ fetch_x_post() {
   echo "Latest X post: $TWEET_TEXT_TRUNCATED"
   X_PREVIEW="<span>Latest Post: \"${TWEET_TEXT_TRUNCATED}\"</span>"
 
-  sed -i.bak "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE" && \
-    rm "$TEMP_FILE.bak" && \
-    rm -f curl_debug.log
+  sed -i.bak "s|<span id=\"x-preview\">[^<]*</span>|<span id=\"x-preview\">${X_PREVIEW}</span>|g" "$TEMP_FILE"
   if [ $? -ne 0 ]; then
     echo "Failed to update X section."
     return 1
   fi
+  
+  rm "$TEMP_FILE.bak"
+  rm -f curl_debug.log
+
   echo "X section updated."
   return 0
 }
@@ -217,7 +218,6 @@ else
 fi
 
 if fetch_x_post; then
-  echo "X section updated."
   UPDATE_NEEDED=1
 else
   echo "X update skipped due to API failure."
@@ -225,7 +225,6 @@ fi
 
 # Apply changes if at least one update was successful
 if [ "$UPDATE_NEEDED" -eq 1 ]; then
-  rm -f curl_debug.log
   mv "$TEMP_FILE" "$HTML_FILE"
   echo "Update complete! Check $HTML_FILE for changes."
 else
