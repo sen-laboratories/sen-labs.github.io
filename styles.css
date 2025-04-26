@@ -306,6 +306,7 @@ h2 {
 
 .social-card.github::after {
   background-image: url('assets/images/github-icon.svg');
+  background-size: 26px;
 }
 
 .social-card.x::after {
@@ -328,7 +329,7 @@ h2 {
 /* YouTube-specific: Style the thumbnail */
 .social-card.youtube .preview img {
   position: relative;
-  z-index: 2;
+  z-index: -1;
   max-width: 90%;
   height: auto;
   display: block;
