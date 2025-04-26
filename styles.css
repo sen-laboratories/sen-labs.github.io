@@ -1,0 +1,443 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body, html {
+  background: #1A1A1A;
+  color: #F4F4F4;
+  font-family: 'Visby Regular', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+/* Neural Network Background with Particles.js */
+.page-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+/* Gradient overlay for fade effect (dark to light grey at the bottom) */
+.page-bg::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 50%, #666666 100%);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 2;
+}
+/* Hero Section */
+.hero {
+  padding: 80px 0 40px 0;
+  text-align: center;
+  background: #1A1A1A;
+}
+.logo {
+  width: 200px;
+  margin-bottom: 10px;
+}
+.hero .logo {
+  width: 520px; /* Updated size for top logo */
+}
+.claim {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #78b4ff;
+}
+.claim .path {
+  color: #2EBFD4;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.subclaim {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 16px;
+  color: #F7F2E1;
+  margin-bottom: 30px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.btn {
+  font-family: 'Visby Bold', sans-serif;
+  padding: 10px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 3;
+}
+.btn-primary {
+  border: 2px solid #2EBFD4;
+  color: #2EBFD4;
+}
+.btn-primary:hover {
+  background: #2EBFD4;
+  color: #F4F4F4;
+  box-shadow: 0 0 12px rgba(46, 191, 212, 0.6);
+  text-decoration: underline;
+  text-decoration-color: #FF33CC;
+}
+.waitlist-caption {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 14px;
+  color: #F7F2E1;
+  margin-top: 10px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.placeholder {
+  color: #F7F2E1;
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 16px;
+  padding: 20px;
+  border: 1px dashed #F7F2E1;
+  max-width: 70%;
+  margin: 40px auto 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.placeholder:hover,
+.placeholder.dragging {
+  transform: translateY(-10px) scale(1.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+.placeholder-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* Haiku-Style Tab for Placeholders */
+.placeholder-tab {
+  position: absolute;
+  top: -20px;
+  left: 10px;
+  width: 70px;
+  height: 20px;
+  background: linear-gradient(to bottom, #78b4ff, #5a9bff);
+  border: 1px solid #2EBFD4;
+  border-bottom: none;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none; /* Prevent default touch behaviors like scrolling */
+}
+.placeholder-tab.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+.placeholder-tab span {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 12px;
+  color: #F4F4F4;
+}
+/* Features Section */
+.features {
+  padding: 40px 0 80px 0;
+  text-align: center;
+  background: #1A1A1A;
+}
+h2 {
+  font-family: 'Visby Bold', sans-serif;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+.features p {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 16px;
+  color: #F7F2E1;
+  margin-bottom: 40px;
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+.feature-card {
+  padding: 20px;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.feature-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.feature-card h3 {
+  font-family: 'Visby Bold', sans-serif;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+.feature-card p {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 15px;
+  color: #F7F2E1;
+  margin: 0;
+}
+/* Demo Section */
+.demo {
+  padding: 60px 0;
+  text-align: center;
+  background: #1A1A1A;
+}
+.demo p {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 16px;
+  color: #F7F2E1;
+  margin-bottom: 30px;
+}
+.btn-demo {
+  background: #FF33CC;
+  color: #F4F4F4;
+  margin-top: 40px;
+  display: inline-block;
+  max-width: 250px;
+}
+.btn-demo:hover {
+  box-shadow: 0 0 12px rgba(255, 51, 204, 0.6);
+  text-decoration: underline;
+  text-decoration-color: #2EBFD4;
+}
+/* Stay Tuned Section */
+.stay-tuned {
+	padding: 60px 0;
+	text-align: center;
+	background: #1A1A1A;
+}
+
+.stay-tuned-links {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	flex-wrap: wrap;
+	margin-top: 30px;
+}
+
+.stay-tuned-links a {
+	text-decoration: none;
+	transition: all 0.3s ease;
+	cursor: pointer;
+	display: block;
+}
+
+.stay-tuned-links a:hover .social-card {
+	transform: translateY(-10px) scale(1.2);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.stay-tuned-links .social-card {
+	width: 250px;
+	height: 200px;
+	background: #333333;
+	border: 1px solid #2EBFD4;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	transition: all 0.3s ease;
+	overflow: visible;
+	position: relative;
+}
+
+/* Social card layout */
+.social-card .preview {
+	position: relative;
+	padding: 15px;
+	background-size: 60px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-color: rgba(0, 0, 0, 0.3);
+	width: 100%;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Channel-specific backgrounds */
+	.social-card.youtube .preview {
+	background-image: url('assets/images/youtube-bg.png');
+	opacity: 0.2;
+}
+
+.social-card.github .preview {
+	background-image: url('assets/images/github-bg.png');
+	opacity: 0.2;
+}
+
+.social-card.x .preview {
+	background-image: url('assets/images/x-bg.png');
+	opacity: 0.2;
+}
+
+.social-card.blog .preview {
+	background-image: url('assets/images/rss-bg.png');
+	background-size: 40px;
+	background-color: rgba(0, 0, 0, 0.5);
+	opacity: 0.2;
+}
+
+/* Ensure content visibility with higher specificity */
+	.stay-tuned-links .social-card .preview span {
+	position: relative;
+	z-index: 2;
+	color: #ffffff !important;
+	width: 100%;
+	text-align: center;
+}
+
+/* YouTube-specific: Ensure img doesn't obscure background */
+.social-card.youtube .preview img {
+	position: relative;
+	z-index: 2;
+	max-width: 75%;
+	height: auto;
+	display: block;
+	margin: 0 auto;
+}
+
+/* GitHub-specific preview layout */
+.social-card.github .preview {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	justify-content: center;
+	padding: 10px;
+}
+
+/* GitHub badge */
+.social-card.github .badge {
+	display: block;
+	width: 70px;
+	height: auto;
+	margin: 0;
+	position: relative;
+	z-index: 2;
+}
+
+/* Caption styling with higher specificity */
+.stay-tuned-links .social-card .caption {
+	font-size: 14px;
+	color: #999 !important;
+	margin: 5px 0;
+	width: 100%;
+	text-align: center;
+	background: rgba(0, 0, 0, 0.5);
+	padding: 5px 0;
+	display: block;
+	z-index: 1;
+	line-height: 1.5;
+}
+
+/* Waitlist Section */
+.waitlist {
+  padding: 60px 0;
+  text-align: center;
+  background: #1A1A1A;
+}
+/* Newsletter Section */
+.newsletter {
+  padding: 40px 0;
+  text-align: center;
+  background: #1A1A1A;
+}
+.newsletter .btn {
+  background: #2EBFD4;
+  color: #F4F4F4;
+}
+.newsletter .btn:hover {
+  box-shadow: 0 0 12px rgba(46, 191, 212, 0.6);
+  text-decoration: underline;
+  text-decoration-color: #FF33CC;
+}
+/* Footer */
+.footer {
+  padding: 40px 0;
+  background: #1A1A1A;
+  text-align: center;
+}
+.footer .logo {
+  width: 200px; /* Updated size for footer logo */
+  margin-bottom: 20px;
+}
+.footer p {
+  font-family: 'Visby Light', sans-serif;
+  font-size: 14px;
+  color: #F7F2E1;
+  margin-bottom: 20px;
+}
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.footer-links a {
+  font-family: 'Visby Light', sans-serif;
+  font-size: 14px;
+  color: #F7F2E1;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.footer-links a:hover {
+  text-decoration: underline;
+  text-decoration-color: #2EBFD4;
+}
+/* Responsive */
+@media (max-width: 768px) {
+  .claim { font-size: 22px; }
+  .subclaim { font-size: 14px; }
+  .waitlist-caption { font-size: 12px; }
+  h2 { font-size: 22px; }
+  .placeholder { max-width: 90%; }
+  .connect-links .social-card {
+    width: 200px; /* Increased by 25% for mobile */
+    height: 125px; /* Increased by 25% for mobile */
+  }
+  .connect-links .social-card .preview span {
+    font-size: 13px;
+  }
+  .connect-links .social-card .caption {
+    font-size: 14px;
+  }
+}
