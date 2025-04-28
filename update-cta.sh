@@ -96,10 +96,20 @@ fetch_youtube_video() {
 
 # Function to fetch the latest commit across all public repos
 fetch_github_data() {
-	# Fetching latest GitHub commit
+# Fetching latest GitHub commit
 	echo "Fetching latest GitHub commit..."
-	commit_info=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-	  "https://api.github.com/orgs/sen-laboratories/repos" | jq -r '.[].pushed_at |= (if . == null then "1970-01-01T00:00:00Z" else . end) | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
+	repos_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
+	# Check if the response is an array
+	if ! echo "$repos_response" | jq -e 'type == "array"' >/dev/null; then
+	  echo "Error: unexpected GitHub API response: $repos_response"
+	  exit 1
+	fi
+	commit_info=$(echo "$repos_response" | jq -r 'map(.pushed_at |= (if . == null then "1970-01-01T00:00:00Z" else . end)) | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
+	
+	if [ -z "$commit_info" ]; then
+	  echo "Error: Failed to fetch latest commit info."
+	  exit 1
+	fi
 	
 	COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
 	branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')

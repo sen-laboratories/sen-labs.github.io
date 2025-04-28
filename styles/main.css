@@ -248,7 +248,7 @@ h2 {
 
 .connect-links a:hover .social-card {
   transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   opacity: 1.0;
 }
 
@@ -293,19 +293,19 @@ h2 {
 }
 
 .social-card.youtube::after {
-  background-image: url('assets/images/youtube-icon.svg');
+  background-image: url('../assets/images/youtube-icon.svg');
 }
 
 .social-card.github::after {
-  background-image: url('assets/images/github-icon.svg');
+  background-image: url('../assets/images/github-icon.svg');
 }
 
 .social-card.x::after {
-  background-image: url('assets/images/x-icon.png');
+  background-image: url('../assets/images/x-icon.png');
 }
 
 .social-card.blog::after {
-  background-image: url('assets/images/rss-icon.png');
+  background-image: url('../assets/images/rss-icon.png');
 }
 
 /* Content styling */
@@ -335,14 +335,6 @@ h2 {
   align-items: flex-start;
   gap: 8px;
   justify-content: center;
-}
-
-/* GitHub badge */
-.social-card.github .badge {
-  display: block;
-  width: 92px;
-  height: auto;
-  margin: 0;
 }
 
 /* Sponsor button styling */
