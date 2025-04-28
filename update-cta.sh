@@ -12,6 +12,7 @@ TEMP_FILE="index_new_temp.html"
 YOUTUBE_PREVIEW_ID="youtube-preview"
 GITHUB_PREVIEW_ID="github-preview"
 X_PREVIEW_ID="x-preview"
+BLOG_PREVIEW_ID="blog-preview"
 
 # Check for required environment variables
 REQUIRED_VARS=("YOUTUBE_API_KEY" "X_BEARER_TOKEN")
@@ -55,6 +56,32 @@ fi
 YOUTUBE_PREVIEW=''
 GITHUB_PREVIEW=''
 X_PREVIEW=''
+BLOG_PREVIEW=''
+
+# function to fetch latest post from Substack over RSS
+
+fetch_blog() {
+	echo "Fetching latest Substack post..."
+	substack_rss=$(curl -s "https://senlabs.substack.com/feed")
+	# Check if the RSS feed was fetched successfully
+	if [ -z "$substack_rss" ]; then
+	  echo "Error: Failed to fetch Substack RSS feed."
+	  return 1
+	fi
+	# Extract the title of the latest post
+	latest_post=$(echo "$substack_rss" | xmllint --xpath "//item[1]/title/text()" - 2>/dev/null)
+	
+	if [ -z "$latest_post" ]; then
+	  echo "Error: Failed to parse latest Substack post title."
+	  return 1
+	fi
+	
+	# Update Substack section
+	sed -i "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\">Latest Post: \"$latest_post\"</span>|g" "$TEMP_FILE"
+	
+	echo "Substack section updated with latest post preview."
+	return 2
+}
 
 # Function to fetch the latest YouTube video
 fetch_youtube_video() {
@@ -99,16 +126,19 @@ fetch_github_data() {
 # Fetching latest GitHub commit
 	echo "Fetching latest GitHub commit..."
 	repos_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
+	# Log the response for debugging
+	echo "API Response: $repos_response" >> debug.log
 	# Check if the response is an array
 	if ! echo "$repos_response" | jq -e 'type == "array"' >/dev/null; then
-	  echo "Error: unexpected GitHub API response: $repos_response"
-	  exit 1
+	  echo "Error: GitHub API response is not an array. Check debug.log for details."
+	  return 1
 	fi
-	commit_info=$(echo "$repos_response" | jq -r 'map(.pushed_at |= (if . == null then "1970-01-01T00:00:00Z" else . end)) | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
+	# Simplify jq expression and handle potential issues
+	commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.pushed_at != null) | {name: .name, pushed_at: (.pushed_at // "1970-01-01T00:00:00Z"), default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
 	
 	if [ -z "$commit_info" ]; then
-	  echo "Error: Failed to fetch latest commit info."
-	  exit 1
+	  echo "Error: Failed to fetch latest commit info. Check debug.log for details."
+	  return 1
 	fi
 	
 	COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
@@ -196,8 +226,6 @@ fetch_x_post() {
 echo "Starting CTA update..."
 UPDATE_NEEDED=0
 cp "$HTML_FILE" "$TEMP_FILE" || { echo "Error: Failed to copy $HTML_FILE to $TEMP_FILE"; exit 1; }
-echo "Initial TEMP_FILE content (${X_PREVIEW_ID}):"
-grep "${X_PREVIEW_ID}" "$TEMP_FILE" || echo "No ${X_PREVIEW_ID} found"
 
 fetch_youtube_video
 YOUTUBE_STATUS=$?

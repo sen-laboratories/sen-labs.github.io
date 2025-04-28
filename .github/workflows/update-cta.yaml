@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up environment
-        run: sudo apt-get install jq
+        run: sudo apt-get install jq libxml2-utils
       - name: Configure Git
         run: |
           git config --global core.autocrlf false
