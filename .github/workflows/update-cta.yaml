@@ -21,6 +21,7 @@ jobs:
           ./update-cta.sh --exclude-web-repo
           sed -i 's/\r$//' index_new.html
         env:
+          SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
