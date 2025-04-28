@@ -123,7 +123,7 @@ fetch_youtube_video() {
 
 # Function to fetch the latest commit across all public repos
 fetch_github_data() {
-# Fetching latest GitHub commit
+	# Fetching latest GitHub commit
 	echo "Fetching latest GitHub commit..."
 	repos_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
 	# Check if the response is OK
@@ -132,10 +132,10 @@ fetch_github_data() {
 	  return 1
 	fi
 	# Simplify jq expression and handle potential issues
-	commit_info=$(echo "$repos_response" | jq -r '[.[] | select{name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(pushed_at) | last | "\(.name): \(.default_branch)"')
-	
+	commit_info=$(echo "$repos_response" | jq -r '[.[] | {name: .name, pushed_at: (.pushed_at // "1970-01-01T00:00:00Z"), default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
+
 	if [ -z "$commit_info" ]; then
-	  echo "Error: Failed to fetch latest commit info. Check debug.log for details."
+	  echo "Error: Failed to fetch latest commit info."
 	  return 1
 	fi
 	
