@@ -60,7 +60,7 @@ BLOG_PREVIEW=''
 
 # function to fetch latest post from Substack over RSS
 
-fetch_blog() {
+fetch_blog_post() {
 	echo "Fetching latest Substack post..."
 	substack_rss=$(curl -s "https://senlabs.substack.com/feed")
 	# Check if the RSS feed was fetched successfully
