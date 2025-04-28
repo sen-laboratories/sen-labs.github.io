@@ -126,15 +126,13 @@ fetch_github_data() {
 # Fetching latest GitHub commit
 	echo "Fetching latest GitHub commit..."
 	repos_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
-	# Log the response for debugging
-	echo "API Response: $repos_response" >> debug.log
-	# Check if the response is an array
+	# Check if the response is OK
 	if ! echo "$repos_response" | jq -e 'type == "array"' >/dev/null; then
-	  echo "Error: GitHub API response is not an array. Check debug.log for details."
+	  echo "Error: unexpected GitHub API response: $repos_response"
 	  return 1
 	fi
 	# Simplify jq expression and handle potential issues
-	commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.pushed_at != null) | {name: .name, pushed_at: (.pushed_at // "1970-01-01T00:00:00Z"), default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
+	commit_info=$(echo "$repos_response" | jq -r '[.[] | select{name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(pushed_at) | last | "\(.name): \(.default_branch)"')
 	
 	if [ -z "$commit_info" ]; then
 	  echo "Error: Failed to fetch latest commit info. Check debug.log for details."
@@ -228,26 +226,34 @@ UPDATE_NEEDED=0
 cp "$HTML_FILE" "$TEMP_FILE" || { echo "Error: Failed to copy $HTML_FILE to $TEMP_FILE"; exit 1; }
 
 fetch_youtube_video
-YOUTUBE_STATUS=$?
-if [ $YOUTUBE_STATUS -eq 2 ]; then
+STATUS=$?
+if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
-elif [ $YOUTUBE_STATUS -eq 1 ]; then
+elif [ $STATUS -eq 1 ]; then
   echo "YouTube update skipped due to API failure or missing span."
 fi
 
 fetch_github_data
-GITHUB_STATUS=$?
-if [ $GITHUB_STATUS -eq 2 ]; then
+STATUS=$?
+if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
-elif [ $GITHUB_STATUS -eq 1 ]; then
+elif [ $STATUS -eq 1 ]; then
   echo "GitHub update skipped due to API failure or missing span."
 fi
 
 fetch_x_post
-X_STATUS=$?
-if [ $X_STATUS -eq 2 ]; then
+STATUS=$?
+if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
-elif [ $X_STATUS -eq 1 ]; then
+elif [ $STATUS -eq 1 ]; then
+  echo "X update skipped due to API failure or missing span."
+fi
+
+fetch_blog_post
+STATUS=$?
+if [ $STATUS -eq 2 ]; then
+  UPDATE_NEEDED=1
+elif [ $STATUS -eq 1 ]; then
   echo "X update skipped due to API failure or missing span."
 fi
 
