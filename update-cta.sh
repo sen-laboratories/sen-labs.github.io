@@ -15,7 +15,7 @@ X_PREVIEW_ID="x-preview"
 BLOG_PREVIEW_ID="blog-preview"
 
 # Check for required environment variables
-REQUIRED_VARS=("YOUTUBE_API_KEY" "X_BEARER_TOKEN")
+REQUIRED_VARS=("YOUTUBE_API_KEY" "X_BEARER_TOKEN" "SUBSTACK_API_KEY")
 for VAR in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!VAR}" ]; then
     echo "Error: Required environment variable $VAR is not set."
@@ -56,33 +56,34 @@ BLOG_PREVIEW=''
 # function to fetch latest post from Substack over RSS
 
 fetch_blog_post() {
-substack_rss=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" \
-  -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
-  -H "Accept-Language: en-US,en;q=0.5" \
-  "https://senlabs.substack.com/feed")
- 	# Log the RSS feed for debugging
-	echo "Substack RSS Response: $substack_rss"
-	# Check if the RSS feed was fetched successfully
-	if [ -z "$substack_rss" ]; then
-	  echo "Error: Failed to fetch Substack RSS feed. Check debug.log for details."
+    substack_rss=$(curl -s curl -H "X-API-Key: $SUBSTACK_API_KEY" "https://api.substackapi.dev/posts/latest?limit=1&publication_url=https%3A%2F%2Fsenlabs.substack.com%2F")
+	# Check if the response was fetched successfully
+    HTTP_STATUS=$(echo "$substack_rss" | tail -n 1)
+	if [ "$HTTP_STATUS" -ne 200 ]; then
+	  echo "Error: got Substack API response: $substack_rss"
 	  return 1
 	fi
 	# Extract the title of the latest post
-	latest_post=$(echo "$substack_rss" | xmllint --xpath "//item[1]/title/text()" - 2>/dev/null | sed 's/<!\[CDATA\[//g' | sed 's/\]\]>//g')
+	latest_post=$(echo "$substack_rss" | jq -r ".data[].title")
 
 	if [ -z "$latest_post" ]; then
 	  echo "Error: Failed to parse latest Substack post title."
 	  return 1
 	fi
-	
+
+	latest_post_url=$(echo "$substack_rss" | jq -r ".data[].url")
+	latest_post_desc=$(echo "$substack_rss" | jq -r ".data[].description")
+    latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
+
 	# Update Substack section
-	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\">Latest Post: \"$latest_post\"</span>|g" "$TEMP_FILE"
+	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\">$latest_post</img></a></span>|g" "$TEMP_FILE"
 	SED_STATUS=$?
-  rm -f "$TEMP_FILE.bak"
-  if [ $SED_STATUS -ne 0 ]; then
-    echo "Error: Failed to update blog section (sed error $SED_STATUS)."
-    return 1
-  fi
+    rm -f "$TEMP_FILE.bak"
+    if [ $SED_STATUS -ne 0 ]; then
+      echo "Error: Failed to update blog section (sed error $SED_STATUS)."
+      return 1
+    fi
+
 	echo "Substack section updated with latest post preview."
 	return 2
 }
@@ -90,7 +91,7 @@ substack_rss=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit
 # Function to fetch the latest YouTube video
 fetch_youtube_video() {
   echo "Fetching latest YouTube video..."
-  CHANNEL_RESPONSE=$(curl -s "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YOUTUBE_CHANNEL_ID}&key=${YOUTUBE_API_KEY}")
+  CHANNEL_RESPONSE=$(curl -s -w "\n%{http_code}" "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YOUTUBE_CHANNEL_ID}&key=${YOUTUBE_API_KEY}")
   UPLOADS_PLAYLIST_ID=$(echo "$CHANNEL_RESPONSE" | jq -r '.items[0].contentDetails.relatedPlaylists.uploads')
 
   if [ -z "$UPLOADS_PLAYLIST_ID" ]; then
@@ -150,7 +151,7 @@ fetch_github_data() {
 	# Log the commit response for debugging
 	echo "Commit Response: $commit_response"
 	# Check the type of the response and extract the commit message accordingly
-	commit=$(echo "$commit_response" | jq -r 'if type == "array" then .[0] else . end | "\(.commit.message) (\(.sha | .[0:7]))"')
+	commit=$(echo "$commit_response" | jq -r ".commit.message")
 	if [ -z "$commit" ]; then
 	  echo "Error: Failed to fetch commit message."
 	  return 1
