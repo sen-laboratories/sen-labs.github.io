@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Ensure required tools are installed
-REQUIRED_TOOLS=("jq", "xmllint", "curl", "python")
+REQUIRED_TOOLS=("jq" "xmllint" "curl" "python")
 for TOOL in "${REQUIRED_TOOLS[@]}"; do
   if ! command -v "${!TOOL}" &> /dev/null ]; then
     echo "Error: Required command $TOOL is not installed."
@@ -56,17 +56,17 @@ BLOG_PREVIEW=''
 # function to fetch latest post from Substack over RSS
 
 fetch_blog_post() {
-	echo "Fetching latest Substack post..."
-	substack_rss=$(curl -s "https://senlabs.substack.com/feed")
+	substack_rss=$(curl -s -A "Mozilla/5.0 (compatible; SENLabsBot/1.0)" "https://senlabs.substack.com/feed")
+	# Log the RSS feed for debugging
+	echo "Substack RSS Response: $substack_rss"
 	# Check if the RSS feed was fetched successfully
 	if [ -z "$substack_rss" ]; then
-	  echo "Error: Failed to fetch Substack RSS feed."
+	  echo "Error: Failed to fetch Substack RSS feed. Check debug.log for details."
 	  return 1
 	fi
 	# Extract the title of the latest post
-	latest_post=$(echo "$substack_rss" | xmllint --xpath "//item[1]/title/text()" - 2>/dev/null)
-	echo latest substack post title is: $latest_post
-	
+	latest_post=$(echo "$substack_rss" | xmllint --xpath "//item[1]/title/text()" - 2>/dev/null | sed 's/<!\[CDATA\[//g' | sed 's/\]\]>//g')
+
 	if [ -z "$latest_post" ]; then
 	  echo "Error: Failed to parse latest Substack post title."
 	  return 1
@@ -133,10 +133,7 @@ fetch_github_data() {
 	  return 1
 	fi
 	# Simplify jq expression and handle potential issues
-	commit_info=$(echo "$repos_response" | jq -r '[.[] | {name: .name, pushed_at: (.pushed_at // "1970-01-01T00:00:00Z"), default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
-  echo repos_response is:
-  echo $repos_response
-  
+  commit_info=$(echo "$repos_response" | jq -r '[.[] | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
 	if [ -z "$commit_info" ]; then
 	  echo "Error: Failed to fetch latest commit info."
 	  return 1
@@ -149,10 +146,7 @@ fetch_github_data() {
 	
 	# Update GitHub section: commit text
 	sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\" style=\"font-family: 'IBM Plex Mono', monospace;\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
-	
-	# Update GitHub stars badge to match the repo of the last commit
-	sed -i "s|src=\"https://img.shields.io/github/stars/sen-laboratories/[^\"]*|src=\"https://img.shields.io/github/stars/sen-laboratories/$COMMIT_REPO?style=social|g" "$TEMP_FILE"
-	
+
 	# Update the link to point to the specific repo
 	sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
 	
