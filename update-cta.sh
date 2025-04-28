@@ -39,18 +39,13 @@ while [ $# -gt 0 ]; do
 done
 
 # Ensure required tools are installed
-if ! command -v jq &> /dev/null; then
-  echo "Error: jq is required but not installed."
-  exit 1
-fi
-if ! command -v curl &> /dev/null; then
-  echo "Error: curl is required but not installed."
-  exit 1
-fi
-if ! command -v python &> /dev/null; then
-  echo "Error: python is required for HTML entity unescaping."
-  exit 1
-fi
+REQUIRED_TOOLS=("jq", "xmllint", "curl", "python")
+for TOOL in "${REQUIRED_TOOLS[@]}"; do
+  if ! command -v "${!TOOL}" &> /dev/null ]; then
+    echo "Error: Required command $TOOL is not installed."
+    exit 1
+  fi
+done
 
 # Initialize preview variables (content only, empty defaults)
 YOUTUBE_PREVIEW=''
@@ -70,6 +65,7 @@ fetch_blog_post() {
 	fi
 	# Extract the title of the latest post
 	latest_post=$(echo "$substack_rss" | xmllint --xpath "//item[1]/title/text()" - 2>/dev/null)
+	echo latest substack post title is: $latest_post
 	
 	if [ -z "$latest_post" ]; then
 	  echo "Error: Failed to parse latest Substack post title."
@@ -77,8 +73,13 @@ fetch_blog_post() {
 	fi
 	
 	# Update Substack section
-	sed -i "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\">Latest Post: \"$latest_post\"</span>|g" "$TEMP_FILE"
-	
+	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\">Latest Post: \"$latest_post\"</span>|g" "$TEMP_FILE"
+	SED_STATUS=$?
+  rm -f "$TEMP_FILE.bak"
+  if [ $SED_STATUS -ne 0 ]; then
+    echo "Error: Failed to update blog section (sed error $SED_STATUS)."
+    return 1
+  fi
 	echo "Substack section updated with latest post preview."
 	return 2
 }
@@ -133,7 +134,9 @@ fetch_github_data() {
 	fi
 	# Simplify jq expression and handle potential issues
 	commit_info=$(echo "$repos_response" | jq -r '[.[] | {name: .name, pushed_at: (.pushed_at // "1970-01-01T00:00:00Z"), default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
-
+  echo repos_response is:
+  echo $repos_response
+  
 	if [ -z "$commit_info" ]; then
 	  echo "Error: Failed to fetch latest commit info."
 	  return 1
@@ -241,7 +244,7 @@ elif [ $STATUS -eq 1 ]; then
   echo "GitHub update skipped due to API failure or missing span."
 fi
 
-fetch_x_post
+# quota for April exceeded! fetch_x_post
 STATUS=$?
 if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
