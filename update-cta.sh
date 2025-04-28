@@ -41,7 +41,7 @@ done
 # Ensure required tools are installed
 REQUIRED_TOOLS=("jq" "xmllint" "curl" "python")
 for TOOL in "${REQUIRED_TOOLS[@]}"; do
-  if ! command -v "${!TOOL}" &> /dev/null ]; then
+  if ! command -v "${TOOL}" &> /dev/null ; then
     echo "Error: Required command $TOOL is not installed."
     exit 1
   fi
