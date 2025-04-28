@@ -56,8 +56,11 @@ BLOG_PREVIEW=''
 # function to fetch latest post from Substack over RSS
 
 fetch_blog_post() {
-	substack_rss=$(curl -s -A "Mozilla/5.0 (compatible; SENLabsBot/1.0)" "https://senlabs.substack.com/feed")
-	# Log the RSS feed for debugging
+substack_rss=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" \
+  -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
+  -H "Accept-Language: en-US,en;q=0.5" \
+  "https://senlabs.substack.com/feed")
+ 	# Log the RSS feed for debugging
 	echo "Substack RSS Response: $substack_rss"
 	# Check if the RSS feed was fetched successfully
 	if [ -z "$substack_rss" ]; then
@@ -126,10 +129,11 @@ fetch_youtube_video() {
 fetch_github_data() {
 	# Fetching latest GitHub commit
 	echo "Fetching latest GitHub commit..."
-	repos_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
+	repos_response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
 	# Check if the response is OK
-	if ! echo "$repos_response" | jq -e 'type == "array"' >/dev/null; then
-	  echo "Error: unexpected GitHub API response: $repos_response"
+	HTTP_STATUS=$(echo "$repos_response" | tail -n 1)
+	if [ "$HTTP_STATUS" -ne 200 ]; then
+	  echo "Error: got GitHub API response: $repos_response"
 	  return 1
 	fi
 	# Simplify jq expression and handle potential issues
@@ -141,9 +145,17 @@ fetch_github_data() {
 	
 	COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
 	branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')
-	commit=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-	  "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch" | jq -r '.[0] | "\(.commit.message) (\(.sha | .[0:7]))"')
-	
+	commit_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+	  "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
+	# Log the commit response for debugging
+	echo "Commit Response: $commit_response"
+	# Check the type of the response and extract the commit message accordingly
+	commit=$(echo "$commit_response" | jq -r 'if type == "array" then .[0] else . end | "\(.commit.message) (\(.sha | .[0:7]))"')
+	if [ -z "$commit" ]; then
+	  echo "Error: Failed to fetch commit message."
+	  return 1
+	fi
+
 	# Update GitHub section: commit text
 	sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\" style=\"font-family: 'IBM Plex Mono', monospace;\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
 
