@@ -61,7 +61,7 @@ fetch_blog_post() {
   latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
 
 	# Update Substack section
-	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\"><br/>$latest_post</img></a></span>|g" "$TEMP_FILE"
+	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\" title=\"$latest_post\"/></a></span>|g" "$TEMP_FILE"
 	SED_STATUS=$?
     rm -f "$TEMP_FILE.bak"
     if [ $SED_STATUS -ne 0 ]; then
@@ -94,7 +94,7 @@ fetch_youtube_video() {
   fi
 
   echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
-  YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\"><br/>${YOUTUBE_TITLE}"
+  YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\" title=\"${VIDEO_TITLE}\">"
   if ! grep -q "<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
     echo "Error: ${YOUTUBE_PREVIEW_ID} span not found in $TEMP_FILE"
     return 1
