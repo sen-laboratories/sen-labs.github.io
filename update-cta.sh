@@ -58,7 +58,7 @@ fetch_blog_post() {
 
 	latest_post_url=$(echo "$substack_rss" | jq -r ".data[].url")
 	latest_post_desc=$(echo "$substack_rss" | jq -r ".data[].description")
-  latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.medium")
+  latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
 
 	# Update Substack section
 	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\" title=\"$latest_post\"/></a></span>|g" "$TEMP_FILE"
