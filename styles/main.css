@@ -320,9 +320,8 @@ h2 {
 
 /* styling for blog preview image */
 .social-card .blog .preview img {
-  position: relative;
   z-index: -1;
-  max-width: 100%;
+  max-width: 80%;
   height: auto;
   border-radius: 8px;
 }
@@ -336,7 +335,7 @@ h2 {
 .social-card .youtube .caption {
 	position: absolute;
   z-index: 10;
-  margin-bottom: -14px;
+  margin-bottom: 4px;
 }
 
 .social-card.youtube .preview img {
