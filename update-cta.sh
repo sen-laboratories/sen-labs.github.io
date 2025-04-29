@@ -61,7 +61,7 @@ fetch_blog_post() {
   latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
 
 	# Update Substack section
-	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\">$latest_post</img></a></span>|g" "$TEMP_FILE"
+	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\"><br/>$latest_post</img></a></span>|g" "$TEMP_FILE"
 	SED_STATUS=$?
     rm -f "$TEMP_FILE.bak"
     if [ $SED_STATUS -ne 0 ]; then
@@ -94,12 +94,12 @@ fetch_youtube_video() {
   fi
 
   echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
-  YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\">"
+  YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\"><br/>${YOUTUBE_TITLE}"
   if ! grep -q "<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
     echo "Error: ${YOUTUBE_PREVIEW_ID} span not found in $TEMP_FILE"
     return 1
   fi
-  # Replace content, preserve outer span
+  # Replace content,\
   sed -i.bak "s|\(<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${YOUTUBE_PREVIEW}\2|g" "$TEMP_FILE"
   SED_STATUS=$?
   rm -f "$TEMP_FILE.bak"
@@ -123,18 +123,17 @@ fetch_github_data() {
 	  return 1
 	fi
 	# Simplify jq expression and handle potential issues
-  commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.name!="sen-laboratories.github.io") | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
+  commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.name!="sen-labs.github.io") | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
 	if [ -z "$commit_info" ]; then
 	  echo "Error: Failed to fetch latest commit info."
 	  return 1
 	fi
 	
 	COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
+	echo Commit info for repo $COMMIT_REPO is $commit_info
+	
 	branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')
-	commit_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-	  "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
-	# Log the commit response for debugging
-	echo "Commit Response: $commit_response"
+	commit_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
 	# Check the type of the response and extract the commit message accordingly
 	commit=$(echo "$commit_response" | jq -r ".commit.message")
 	if [ -z "$commit" ]; then

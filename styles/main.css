@@ -321,7 +321,7 @@ h2 {
 .social-card.blog .preview img {
   position: relative;
   z-index: -1;
-  max-width: 850%;
+  max-width: 85%;
   height: auto;
   border-radius: 8px;
   margin-bottom: 4px;
@@ -331,7 +331,7 @@ h2 {
 .social-card.youtube .preview img {
   position: relative;
   z-index: -1;
-  max-width: 85%;
+  max-width: 75%;
   height: auto;
   display: block;
   margin: 0 auto;
