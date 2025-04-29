@@ -23,21 +23,6 @@ for VAR in "${REQUIRED_VARS[@]}"; do
   fi
 done
 
-# Parse command-line flag
-EXCLUDE_WEB_REPO=0
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --exclude-web-repo)
-      EXCLUDE_WEB_REPO=1
-      shift
-      ;;
-    *)
-      echo "Unknown option: $1"
-      exit 1
-      ;;
-  esac
-done
-
 # Ensure required tools are installed
 REQUIRED_TOOLS=("jq" "xmllint" "curl" "python")
 for TOOL in "${REQUIRED_TOOLS[@]}"; do
@@ -56,9 +41,9 @@ BLOG_PREVIEW=''
 # function to fetch latest post from Substack over RSS
 
 fetch_blog_post() {
-    substack_rss=$(curl -s curl -H "X-API-Key: $SUBSTACK_API_KEY" "https://api.substackapi.dev/posts/latest?limit=1&publication_url=https%3A%2F%2Fsenlabs.substack.com%2F")
+  substack_rss=$(curl -s curl -H "X-API-Key: $SUBSTACK_API_KEY" "https://api.substackapi.dev/posts/latest?limit=1&publication_url=https%3A%2F%2Fsenlabs.substack.com%2F")
 	# Check if the response was fetched successfully
-    HTTP_STATUS=$(echo "$substack_rss" | tail -n 1)
+  HTTP_STATUS=$(echo "$substack_rss" | tail -n 1)
 	if [ "$HTTP_STATUS" -ne 200 ]; then
 	  echo "Error: got Substack API response: $substack_rss"
 	  return 1
@@ -73,7 +58,7 @@ fetch_blog_post() {
 
 	latest_post_url=$(echo "$substack_rss" | jq -r ".data[].url")
 	latest_post_desc=$(echo "$substack_rss" | jq -r ".data[].description")
-    latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
+  latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
 
 	# Update Substack section
 	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\">$latest_post</img></a></span>|g" "$TEMP_FILE"
@@ -138,7 +123,7 @@ fetch_github_data() {
 	  return 1
 	fi
 	# Simplify jq expression and handle potential issues
-  commit_info=$(echo "$repos_response" | jq -r '[.[] | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
+  commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.name!="sen-laboratories.github.io") | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
 	if [ -z "$commit_info" ]; then
 	  echo "Error: Failed to fetch latest commit info."
 	  return 1

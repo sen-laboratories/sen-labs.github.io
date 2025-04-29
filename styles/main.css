@@ -317,11 +317,21 @@ h2 {
   line-height: 1.4;
 }
 
+/* styling for blog preview image */
+.social-card.blog .preview img {
+  position: relative;
+  z-index: -1;
+  max-width: 850%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
 /* YouTube-specific: Style the thumbnail */
 .social-card.youtube .preview img {
   position: relative;
   z-index: -1;
-  max-width: 90%;
+  max-width: 85%;
   height: auto;
   display: block;
   margin: 0 auto;
