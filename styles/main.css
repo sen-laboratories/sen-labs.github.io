@@ -72,9 +72,9 @@ body, html {
 .cta-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 .btn {
   font-family: 'Visby Bold', sans-serif;
@@ -102,10 +102,10 @@ body, html {
   font-family: 'Visby Regular', sans-serif;
   font-size: 14px;
   color: #F7F2E1;
-  margin-top: 10px;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 48px;
 }
 .placeholder {
   color: #F7F2E1;
@@ -157,7 +157,7 @@ body, html {
 }
 /* Features Section */
 .features {
-  padding: 40px 0 80px 0;
+  padding: 40px 0 40px 0;
   text-align: center;
   background: #1A1A1A;
 }
@@ -201,7 +201,6 @@ h2 {
 }
 /* Demo Section */
 .demo {
-  padding: 60px 0;
   text-align: center;
   background: #1A1A1A;
 }
@@ -212,16 +211,17 @@ h2 {
   margin-bottom: 30px;
 }
 .btn-demo {
-  background: #FF33CC;
+  border: 2px solid #FF33CC;
   color: #F4F4F4;
-  margin-top: 40px;
+  margin-top: 20px;
   display: inline-block;
   max-width: 250px;
 }
 .btn-demo:hover {
-  box-shadow: 0 0 12px rgba(255, 51, 204, 0.6);
+  background: #FF33CC;
+  box-shadow: 0 0 12px rgba(46, 191, 212, 0.6);
   text-decoration: underline;
-  text-decoration-color: #2EBFD4;
+  text-decoration-color: #FF33CC;
 }
 
 /* Connect Section (Stay Tuned) */
@@ -246,15 +246,15 @@ h2 {
   display: block;
 }
 
-.connect-links a:hover .social-card {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+.social-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0.3, 0.5);
   opacity: 1.0;
 }
 
 .connect-links .social-card {
   width: 250px;
-  height: 180px;
+  height: 190px;
   background: #333333; /* Dark background */
   border: 1px solid #2EBFD4;
   border-radius: 8px;
@@ -267,6 +267,15 @@ h2 {
   position: relative;
   padding: 10px;
   opacity: 0.64;
+}
+
+.social-card a {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%; /* Ensure full width */
+    text-decoration: none;
+    color: inherit;
 }
 
 /* Preview area (content) */
@@ -292,6 +301,13 @@ h2 {
   background-repeat: no-repeat;
 }
 
+.social-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    pointer-events: none; /* Prevent image from blocking hover */
+}
+
 .social-card.youtube::after {
   background-image: url('../assets/images/youtube-icon.svg');
 }
@@ -309,20 +325,19 @@ h2 {
 }
 
 /* Content styling */
-.connect-links .social-card .preview span {
+.social-card .preview span {
   color: #ffffff !important; /* White text for dark background */
   width: 100%;
   text-align: left;
   font-size: 14px;
-  line-height: 1.4;
-  margin-bottom: 4px;
 }
 
 /* styling for blog preview image */
-.social-card .blog .preview img {
+.social-card.blog .preview img {
   z-index: -1;
   max-width: 80%;
   height: auto;
+  margin-bottom: 8px;
   border-radius: 8px;
 }
 
@@ -332,17 +347,21 @@ h2 {
   margin: 0px;
 }
 
-.social-card .youtube .caption {
-	position: absolute;
-  z-index: 10;
-  margin-bottom: 4px;
+/* span style, dynamically changed so define here */
+#youtube-preview {
+  height: 150px;
 }
 
-.social-card.youtube .preview img {
+.social-card .youtube .preview img {
   z-index: -1;
-  max-width: 80%;
   height: auto;
   border-radius: 8px;
+}
+
+.social-card .youtube .caption {
+  position: absolute;
+  z-index: 10;
+  margin-bottom: 10px;
 }
 
 /* GitHub-specific: stack commit */
@@ -361,20 +380,17 @@ h2 {
 }
 
 .connect-links .social-card .sponsor img {
-  height: 24px;
+  height: 22px;
 }
 
 /* Caption styling */
 .connect-links .social-card .caption {
   font-size: 14px;
   color: #FEFEFE; /* Lighter grey for contrast on dark background */
-  margin: 4px 0;
   width: 100%;
   text-align: left;
   margin-left: 10px;
-  padding: 4px 0;
   display: block;
-  line-height: 1.5;
 }
 
 /* Waitlist Section */
@@ -389,15 +405,7 @@ h2 {
   text-align: center;
   background: #1A1A1A;
 }
-.newsletter .btn {
-  background: #2EBFD4;
-  color: #F4F4F4;
-}
-.newsletter .btn:hover {
-  box-shadow: 0 0 12px rgba(46, 191, 212, 0.6);
-  text-decoration: underline;
-  text-decoration-color: #FF33CC;
-}
+
 /* Footer */
 .footer {
   padding: 40px 0;

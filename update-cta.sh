@@ -42,35 +42,35 @@ BLOG_PREVIEW=''
 
 fetch_blog_post() {
   substack_rss=$(curl -s curl -H "X-API-Key: $SUBSTACK_API_KEY" "https://api.substackapi.dev/posts/latest?limit=1&publication_url=https%3A%2F%2Fsenlabs.substack.com%2F")
-	# Check if the response was fetched successfully
+  # Check if the response was fetched successfully
   HTTP_STATUS=$(echo "$substack_rss" | tail -n 1)
-	if [ "$HTTP_STATUS" -ne 200 ]; then
-	  echo "Error: got Substack API response: $substack_rss"
-	  return 1
-	fi
-	# Extract the title of the latest post
-	latest_post=$(echo "$substack_rss" | jq -r ".data[].title")
+    if [ "$HTTP_STATUS" -ne 200 ]; then
+      echo "Error: got Substack API response: $substack_rss"
+      return 1
+    fi
+    # Extract the title of the latest post
+    latest_post=$(echo "$substack_rss" | jq -r ".data[].title")
 
-	if [ -z "$latest_post" ]; then
-	  echo "Error: Failed to parse latest Substack post title."
-	  return 1
-	fi
+    if [ -z "$latest_post" ]; then
+      echo "Error: Failed to parse latest Substack post title."
+      return 1
+    fi
 
-	latest_post_url=$(echo "$substack_rss" | jq -r ".data[].url")
-	latest_post_desc=$(echo "$substack_rss" | jq -r ".data[].description")
-  latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
+    latest_post_url=$(echo "$substack_rss" | jq -r ".data[].url")
+    latest_post_desc=$(echo "$substack_rss" | jq -r ".data[].description")
+    latest_post_img=$(echo "$substack_rss" | jq -r ".data[].cover_image.small")
 
-	# Update Substack section
-	sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\" title=\"$latest_post\"/></a></span>|g" "$TEMP_FILE"
-	SED_STATUS=$?
+    # Update Substack section
+    sed -i.bak "s|<span id=\"$BLOG_PREVIEW_ID\".*</span>|<span id=\"$BLOG_PREVIEW_ID\"><a href=\"$latest_post_url\"><img src=\"$latest_post_img\" alt=\"$latest_post_desc\" title=\"$latest_post\"/></a></span>|g" "$TEMP_FILE"
+    SED_STATUS=$?
     rm -f "$TEMP_FILE.bak"
     if [ $SED_STATUS -ne 0 ]; then
       echo "Error: Failed to update blog section (sed error $SED_STATUS)."
       return 1
     fi
 
-	echo "Substack section updated with latest post preview."
-	return 2
+    echo "Substack section updated with latest post preview."
+    return 2
 }
 
 # Function to fetch the latest YouTube video
@@ -113,41 +113,41 @@ fetch_youtube_video() {
 
 # Function to fetch the latest commit across all public repos
 fetch_github_data() {
-	# Fetching latest GitHub commit
-	echo "Fetching latest GitHub commit..."
-	repos_response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
-	# Check if the response is OK
-	HTTP_STATUS=$(echo "$repos_response" | tail -n 1)
-	if [ "$HTTP_STATUS" -ne 200 ]; then
-	  echo "Error: got GitHub API response: $repos_response"
-	  return 1
-	fi
-	# Simplify jq expression and handle potential issues
+    # Fetching latest GitHub commit
+    echo "Fetching latest GitHub commit..."
+    repos_response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
+    # Check if the response is OK
+    HTTP_STATUS=$(echo "$repos_response" | tail -n 1)
+    if [ "$HTTP_STATUS" -ne 200 ]; then
+      echo "Error: got GitHub API response: $repos_response"
+      return 1
+    fi
+    # Simplify jq expression and handle potential issues
   commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.name!="sen-labs.github.io") | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
-	if [ -z "$commit_info" ]; then
-	  echo "Error: Failed to fetch latest commit info."
-	  return 1
-	fi
-	
-	COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
-	echo Commit info for repo $COMMIT_REPO is $commit_info
-	
-	branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')
-	commit_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
-	# Check the type of the response and extract the commit message accordingly
-	commit=$(echo "$commit_response" | jq -r ".commit.message")
-	if [ -z "$commit" ]; then
-	  echo "Error: Failed to fetch commit message."
-	  return 1
-	fi
+    if [ -z "$commit_info" ]; then
+      echo "Error: Failed to fetch latest commit info."
+      return 1
+    fi
 
-	# Update GitHub section: commit text
-	sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\" style=\"font-family: 'IBM Plex Mono', monospace;\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
+    COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
+    echo Commit info for repo $COMMIT_REPO is $commit_info
 
-	# Update the link to point to the specific repo
-	sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
-	
-	echo "GitHub section updated with dynamic repo stats and link."
+    branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')
+    commit_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
+    # Check the type of the response and extract the commit message accordingly
+    commit=$(echo "$commit_response" | jq -r ".commit.message")
+    if [ -z "$commit" ]; then
+      echo "Error: Failed to fetch commit message."
+      return 1
+    fi
+
+    # Update GitHub section: commit text
+    sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\" style=\"font-family: 'IBM Plex Mono', monospace;\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
+
+    # Update the link to point to the specific repo
+    sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
+
+    echo "GitHub section updated with dynamic repo stats and link."
   return 2  # Indicate update made
 }
 
@@ -235,7 +235,7 @@ elif [ $STATUS -eq 1 ]; then
   echo "GitHub update skipped due to API failure or missing span."
 fi
 
-# quota for April exceeded! fetch_x_post
+fetch_x_post
 STATUS=$?
 if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
