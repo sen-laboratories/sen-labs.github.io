@@ -3,19 +3,18 @@
 # Configuration
 YOUTUBE_CHANNEL_ID="UCRR013YJAj1i4qM_KYciNaw"
 GITHUB_ORG="sen-laboratories"
-X_USER_ID="1384973683287105536"
-
+BSKY_HANDLE='sen-labs.org'
 HTML_FILE="index_new.html"
 TEMP_FILE="index_new_temp.html"
 
 # Preview ID placeholders
 YOUTUBE_PREVIEW_ID="youtube-preview"
 GITHUB_PREVIEW_ID="github-preview"
-X_PREVIEW_ID="x-preview"
+BSKY_PREVIEW_ID="bsky-preview"
 BLOG_PREVIEW_ID="blog-preview"
 
 # Check for required environment variables
-REQUIRED_VARS=("YOUTUBE_API_KEY" "X_BEARER_TOKEN" "SUBSTACK_API_KEY")
+REQUIRED_VARS=("YOUTUBE_API_KEY" "BSKY_APP_PASSWORD" "SUBSTACK_API_KEY")
 for VAR in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!VAR}" ]; then
     echo "Error: Required environment variable $VAR is not set."
@@ -24,7 +23,7 @@ for VAR in "${REQUIRED_VARS[@]}"; do
 done
 
 # Ensure required tools are installed
-REQUIRED_TOOLS=("jq" "xmllint" "curl" "python")
+REQUIRED_TOOLS=("jq" "curl" "python")
 for TOOL in "${REQUIRED_TOOLS[@]}"; do
   if ! command -v "${TOOL}" &> /dev/null ; then
     echo "Error: Required command $TOOL is not installed."
@@ -35,17 +34,16 @@ done
 # Initialize preview variables (content only, empty defaults)
 YOUTUBE_PREVIEW=''
 GITHUB_PREVIEW=''
-X_PREVIEW=''
+BSKY_PREVIEW=''
 BLOG_PREVIEW=''
 
 # function to fetch latest post from Substack over RSS
 
 fetch_blog_post() {
-  substack_rss=$(curl -s curl -H "X-API-Key: $SUBSTACK_API_KEY" "https://api.substackapi.dev/posts/latest?limit=1&publication_url=https%3A%2F%2Fsenlabs.substack.com%2F")
-  # Check if the response was fetched successfully
-  HTTP_STATUS=$(echo "$substack_rss" | tail -n 1)
-    if [ "$HTTP_STATUS" -ne 200 ]; then
-      echo "Error: got Substack API response: $substack_rss"
+    substack_rss=$(curl -s --fail-with-body -H "X-API-Key: $SUBSTACK_API_KEY" "https://api.substackapi.dev/posts/latest?limit=1&publication_url=https%3A%2F%2Fsenlabs.substack.com%2F")
+    # Check if the response was fetched successfully
+    if [ $? -eq 22 ]; then
+      echo "failed to retrieve response from Substack."
       return 1
     fi
     # Extract the title of the latest post
@@ -75,65 +73,62 @@ fetch_blog_post() {
 
 # Function to fetch the latest YouTube video
 fetch_youtube_video() {
-  echo "Fetching latest YouTube video..."
-  CHANNEL_RESPONSE=$(curl -s -w "\n%{http_code}" "https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YOUTUBE_CHANNEL_ID}&key=${YOUTUBE_API_KEY}")
-  UPLOADS_PLAYLIST_ID=$(echo "$CHANNEL_RESPONSE" | jq -r '.items[0].contentDetails.relatedPlaylists.uploads')
+    echo "Fetching latest YouTube video..."
 
-  if [ -z "$UPLOADS_PLAYLIST_ID" ]; then
-    echo "Failed to fetch uploads playlist ID."
-    return 1
-  fi
+    VIDEO_RESPONSE=$(curl -s --fail-with-body "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YOUTUBE_CHANNEL_ID}&maxResults=1&order=date&type=video&key=${YOUTUBE_API_KEY}")
+    if [ $? -eq 22 ]; then
+        echo "failed to retrieve response from Youtube."
+        return 1
+    fi
+    VIDEO_ID=$(echo "$VIDEO_RESPONSE" | jq -r '.items[0].id.videoId')
+    VIDEO_TITLE=$(echo "$VIDEO_RESPONSE" | jq -r '.items[0].snippet.title')
 
-  VIDEO_RESPONSE=$(curl -s "https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${UPLOADS_PLAYLIST_ID}&maxResults=1&key=${YOUTUBE_API_KEY}")
-  VIDEO_ID=$(echo "$VIDEO_RESPONSE" | jq -r '.items[0].snippet.resourceId.videoId')
-  VIDEO_TITLE=$(echo "$VIDEO_RESPONSE" | jq -r '.items[0].snippet.title')
+    if [ -z "$VIDEO_ID" ]; then
+      echo "Failed to fetch latest video."
+      return 1
+    fi
 
-  if [ -z "$VIDEO_ID" ]; then
-    echo "Failed to fetch latest video."
-    return 1
-  fi
-
-  echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
-  YOUTUBE_PREVIEW="<img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\" title=\"${VIDEO_TITLE}\">"
-  if ! grep -q "<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
-    echo "Error: ${YOUTUBE_PREVIEW_ID} span not found in $TEMP_FILE"
-    return 1
-  fi
-  # Replace content,\
-  sed -i.bak "s|\(<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${YOUTUBE_PREVIEW}\2|g" "$TEMP_FILE"
-  SED_STATUS=$?
-  rm -f "$TEMP_FILE.bak"
-  if [ $SED_STATUS -ne 0 ]; then
-    echo "Error: Failed to update YouTube section (sed error)."
-    return 1
-  fi
-  echo "YouTube section updated."
-  return 2  # Indicate update made
+    echo "Latest YouTube video: $VIDEO_TITLE (ID: $VIDEO_ID)"
+    YOUTUBE_PREVIEW="<a href=\"https://www.youtube.com/watch?v=${VIDEO_ID}\"><img src=\"https://img.youtube.com/vi/${VIDEO_ID}/0.jpg\" alt=\"${VIDEO_TITLE}\" title=\"${VIDEO_TITLE}\"/></a>"
+    if ! grep -q "<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
+      echo "Error: ${YOUTUBE_PREVIEW_ID} span not found in $TEMP_FILE"
+      return 1
+    fi
+    # Replace content,\
+    sed -i.bak "s|\(<span id=[\"']${YOUTUBE_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${YOUTUBE_PREVIEW}\2|g" "$TEMP_FILE"
+    SED_STATUS=$?
+    rm -f "$TEMP_FILE.bak"
+    if [ $SED_STATUS -ne 0 ]; then
+      echo "Error: Failed to update YouTube section (sed error)."
+      return 1
+    fi
+    echo "YouTube section updated."
+    return 2  # Indicate update made
 }
 
 # Function to fetch the latest commit across all public repos
 fetch_github_data() {
     # Fetching latest GitHub commit
     echo "Fetching latest GitHub commit..."
-    repos_response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
-    # Check if the response is OK
-    HTTP_STATUS=$(echo "$repos_response" | tail -n 1)
-    if [ "$HTTP_STATUS" -ne 200 ]; then
-      echo "Error: got GitHub API response: $repos_response"
+    repos_response=$(curl -s --fail-with-body -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/orgs/sen-laboratories/repos")
+    if [ $? -eq 22 ]; then
+      echo "failed to retrieve response from Github."
       return 1
     fi
     # Simplify jq expression and handle potential issues
-  commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.name!="sen-labs.github.io") | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')  
+    commit_info=$(echo "$repos_response" | jq -r '[.[] | select(.name!="sen-labs.github.io") | {name: .name, pushed_at: .pushed_at, default_branch: .default_branch}] | sort_by(.pushed_at) | last | "\(.name): \(.default_branch)"')
     if [ -z "$commit_info" ]; then
       echo "Error: Failed to fetch latest commit info."
       return 1
     fi
 
     COMMIT_REPO=$(echo "$commit_info" | cut -d':' -f1)
-    echo Commit info for repo $COMMIT_REPO is $commit_info
-
     branch=$(echo "$commit_info" | cut -d':' -f2 | tr -d ' ')
-    commit_response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
+    commit_response=$(curl -s --fail-with-body -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/sen-laboratories/$COMMIT_REPO/commits/$branch")
+    if [ $? -eq 22 ]; then
+      echo "failed to retrieve response for latet commit from Github."
+      return 1
+    fi
     # Check the type of the response and extract the commit message accordingly
     commit=$(echo "$commit_response" | jq -r ".commit.message")
     if [ -z "$commit" ]; then
@@ -148,70 +143,79 @@ fetch_github_data() {
     sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"
 
     echo "GitHub section updated with dynamic repo stats and link."
-  return 2  # Indicate update made
+    return 2  # Indicate update made
 }
 
-# Function to fetch the latest X post
-fetch_x_post() {
-  echo "Fetching latest X post..."
-  RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer ${X_BEARER_TOKEN}" "https://api.twitter.com/2/users/${X_USER_ID}/tweets?max_results=10&exclude=retweets&tweet.fields=text")
-  HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
-  TWEET_RESPONSE=$(echo "$RESPONSE" | sed -e '$d')
+# Function to fetch the latest Bluesky post
+fetch_bluesky_post() {
+    echo "Fetching latest Bluesky post..."
+    # Get API key with the app password
+    API_KEY_URL='https://bsky.social/xrpc/com.atproto.server.createSession'
+    POST_DATA="{ \"identifier\": \"${BSKY_HANDLE}\", \"password\": \"${BSKY_APP_PASSWORD}\" }"
+    API_KEY=$(curl -s --fail-with-body -X POST \
+        -H 'Content-Type: application/json' \
+        -d "$POST_DATA" \
+        "$API_KEY_URL" | jq -r .accessJwt)
 
-  if [ "$HTTP_STATUS" -ne 200 ]; then
-    ERROR_TITLE=$(echo "$TWEET_RESPONSE" | jq -r '.title // .errors[0].title // "Unknown Error"')
-    ERROR_DETAIL=$(echo "$TWEET_RESPONSE" | jq -r '.detail // .errors[0].detail // "No details provided"')
-    echo "Could not get latest post from X, got HTTP status $HTTP_STATUS: $ERROR_TITLE, detail: $ERROR_DETAIL"
-    echo "Raw response: $TWEET_RESPONSE"
-    return 1
-  fi
+    if [ $? -eq 22 ]; then
+      echo "failed to retrieve response from Substack."
+      return 1
+    fi
 
-  if [ -z "$TWEET_RESPONSE" ] || ! echo "$TWEET_RESPONSE" | jq -e . >/dev/null 2>&1; then
-    echo "Could not get latest post from X, got invalid or empty response"
-    echo "Raw response: $TWEET_RESPONSE"
-    return 1
-  fi
+    # Get a user's feed
+    LIMIT=1
+    FEED_URL="https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed"
+    TWEET_RESPONSE=$(curl -s --fail-with-body -G \
+        -H "Authorization: Bearer ${API_KEY}" \
+        --data-urlencode "actor=${BSKY_HANDLE}" \
+        --data-urlencode "limit=${LIMIT}" \
+        "$FEED_URL" | jq '.feed | .[] | select((.post.record."$type" == "app.bsky.feed.post") and (.post.record.reply.parent? | not) and (.reason? | not)) | {text: .post.record.text, createdAt: .post.record.createdAt, replyCount: .post.replyCount, repostCount: .post.repostCount, likeCount: .post.likeCount, author: {handle: .post.author.handle, displayName: .post.author.displayName, avatar: .post.author.avatar}}')
 
-  TWEET_TEXT=$(echo "$TWEET_RESPONSE" | jq -r '.data[0].text // ""')
+    if [ $? -eq 22 ]; then
+        echo "failed to retrieve response for latet post from Bluesky"
+        return 1
+    fi
 
-  if [ -z "$TWEET_TEXT" ]; then
-    echo "Failed to fetch latest X post (no text found)."
-    echo "Raw response: $TWEET_RESPONSE"
-    return 1
-  fi
+    TWEET_TEXT=$(echo "$TWEET_RESPONSE" | jq -r '.text // ""')
 
-  # Replace newlines with spaces to prevent Python syntax errors
-  TWEET_TEXT_ESCAPED=$(echo "$TWEET_TEXT" | tr '\n' ' ')
-  # Escape single quotes for Python
-  TWEET_TEXT_QUOTED=$(echo "$TWEET_TEXT_ESCAPED" | sed "s/'/\\\'/g")
-  # Unescape HTML entities, treat warnings as errors
-  TWEET_TEXT_UNESCAPED=$(python -W error -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))" 2>/dev/null)
-  if [ $? -ne 0 ]; then
-    echo "Failed to unescape HTML entities in tweet: '$TWEET_TEXT_QUOTED'"
-    return 1
-  fi
-  # Sanitize for sed
-  TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&]/\\&/g; s/"/\\"/g')
-  TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-50)
-  if [ ${#TWEET_TEXT_CLEAN} -gt 50 ]; then
-    TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
-  fi
-  echo "Latest X post: $TWEET_TEXT_TRUNCATED"
-  X_PREVIEW="Latest: \"${TWEET_TEXT_TRUNCATED}\""
-  if ! grep -q "<span id=[\"']${X_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
-    echo "Error: ${X_PREVIEW_ID} span not found in $TEMP_FILE"
-    return 1
-  fi
-  # Replace content, preserve outer span
-  sed -i.bak "s|\(<span id=[\"']${X_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${X_PREVIEW}\2|g" "$TEMP_FILE"
-  SED_STATUS=$?
-  rm -f "$TEMP_FILE.bak"
-  if [ $SED_STATUS -ne 0 ]; then
-    echo "Error: Failed to update X section (sed error)."
-    return 1
-  fi
-  echo "X section updated."
-  return 2  # Indicate update made
+    if [ -z "$TWEET_TEXT" ]; then
+      echo "Failed to fetch latest Bluesky post (no text found)."
+      echo "Raw response: $TWEET_RESPONSE"
+      return 1
+    fi
+
+    # Replace newlines with spaces to prevent Python syntax errors
+    TWEET_TEXT_ESCAPED=$(echo "$TWEET_TEXT" | tr '\n' ' ')
+    # Escape single quotes for Python
+    TWEET_TEXT_QUOTED=$(echo "$TWEET_TEXT_ESCAPED" | sed "s/'/\\\'/g")
+    # Unescape HTML entities, treat warnings as errors
+    TWEET_TEXT_UNESCAPED=$(python -W error -c "import html; print(html.unescape('$TWEET_TEXT_QUOTED'.replace('\0', '')))" 2>/dev/null)
+    if [ $? -ne 0 ]; then
+      echo "Failed to unescape HTML entities in tweet: '$TWEET_TEXT_QUOTED'"
+      return 1
+    fi
+    # Sanitize for sed
+    TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&]/\\&/g; s/"/\\"/g')
+    TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-50)
+    if [ ${#TWEET_TEXT_CLEAN} -gt 50 ]; then
+      TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
+    fi
+    echo "Latest Bluesky post: $TWEET_TEXT_TRUNCATED"
+    BSKY_PREVIEW="Latest: \"${TWEET_TEXT_TRUNCATED}\""
+    if ! grep -q "<span id=[\"']${BSKY_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
+      echo "Error: ${BSKY_PREVIEW_ID} span not found in $TEMP_FILE"
+      return 1
+    fi
+    # Replace content, preserve outer span
+    sed -i.bak "s|\(<span id=[\"']${BSKY_PREVIEW_ID}[\"'][^>]*>\).*\(</span>\)|\1${BSKY_PREVIEW}\2|g" "$TEMP_FILE"
+    SED_STATUS=$?
+    rm -f "$TEMP_FILE.bak"
+    if [ $SED_STATUS -ne 0 ]; then
+      echo "Error: Failed to update Bluesky section (sed error)."
+      return 1
+    fi
+    echo "Bluesky section updated."
+    return 2  # Indicate update made
 }
 
 # Fetch all data and update HTML sections
@@ -235,12 +239,12 @@ elif [ $STATUS -eq 1 ]; then
   echo "GitHub update skipped due to API failure or missing span."
 fi
 
-fetch_x_post
+fetch_bluesky_post
 STATUS=$?
 if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
 elif [ $STATUS -eq 1 ]; then
-  echo "X update skipped due to API failure or missing span."
+  echo "Bluesky update skipped due to API failure or missing span."
 fi
 
 fetch_blog_post
@@ -248,7 +252,7 @@ STATUS=$?
 if [ $STATUS -eq 2 ]; then
   UPDATE_NEEDED=1
 elif [ $STATUS -eq 1 ]; then
-  echo "X update skipped due to API failure or missing span."
+  echo "Blog update skipped due to API failure or missing span."
 fi
 
 # Apply changes if at least one update was successful

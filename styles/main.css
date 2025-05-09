@@ -98,15 +98,6 @@ body, html {
   text-decoration: underline;
   text-decoration-color: #FF33CC;
 }
-.waitlist-caption {
-  font-family: 'Visby Regular', sans-serif;
-  font-size: 14px;
-  color: #F7F2E1;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 48px;
-}
 .placeholder {
   color: #F7F2E1;
   font-family: 'Visby Regular', sans-serif;
@@ -236,7 +227,7 @@ h2 {
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
-  margin-top: 30px;
+  margin-top: 48px;
 }
 
 .connect-links a {
@@ -270,12 +261,12 @@ h2 {
 }
 
 .social-card a {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%; /* Ensure full width */
-    text-decoration: none;
-    color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%; /* Ensure full width */
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Preview area (content) */
@@ -302,10 +293,10 @@ h2 {
 }
 
 .social-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: contain;
-    pointer-events: none; /* Prevent image from blocking hover */
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  pointer-events: none; /* Prevent image from blocking hover */
 }
 
 .social-card.youtube::after {
@@ -313,11 +304,11 @@ h2 {
 }
 
 .social-card.github::after {
-  background-image: url('../assets/images/github-icon.svg');
+  background-image: url('../assets/images/github-logo.svg');
 }
 
-.social-card.x::after {
-  background-image: url('../assets/images/x-icon.png');
+.social-card.bsky::after {
+  background-image: url('../assets/images/bluesky-logo.svg');
 }
 
 .social-card.blog::after {
@@ -341,20 +332,11 @@ h2 {
   border-radius: 8px;
 }
 
-/* YouTube-specific: Style the thumbnail */
-.social-card .youtube .preview {
-  padding: 0px;
-  margin: 0px;
-}
-
-/* span style, dynamically changed so define here */
-#youtube-preview {
-  height: 150px;
-}
-
 .social-card .youtube .preview img {
   z-index: -1;
+  max-width: 80%;
   height: auto;
+  margin-bottom: 8px;
   border-radius: 8px;
 }
 
@@ -392,12 +374,28 @@ h2 {
   margin-left: 10px;
   display: block;
 }
+.connect-links .social-card .caption  a:hover {
+  text-decoration: underline;
+  text-decoration-color: #2EBFD4;
+}
 
 /* Waitlist Section */
 .waitlist {
-  padding: 60px 0;
-  text-align: center;
-  background: #1A1A1A;
+  display: flex;
+  justify-content: center;
+}
+.waitlist .container {
+  margin: 24px;
+}
+
+.waitlist-caption {
+  font-family: 'Visby Regular', sans-serif;
+  font-size: 14px;
+  color: #F7F2E1;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 32px;
 }
 /* Newsletter Section */
 .newsletter {
@@ -442,6 +440,7 @@ h2 {
   text-decoration: underline;
   text-decoration-color: #2EBFD4;
 }
+
 /* Responsive */
 @media (max-width: 768px) {
   .claim { font-size: 22px; }
