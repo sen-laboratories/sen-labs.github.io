@@ -280,6 +280,10 @@ h2 {
   padding: 10px;
 }
 
+#bsky-preview {
+  width: 90%;
+}
+
 /* Channel-specific icons in top-right corner */
 .social-card::after {
   content: '';

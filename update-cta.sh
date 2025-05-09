@@ -196,11 +196,12 @@ fetch_bluesky_post() {
     fi
     # Sanitize for sed
     TWEET_TEXT_CLEAN=$(echo "$TWEET_TEXT_UNESCAPED" | tr -d '\n\r\t' | sed 's/[\\/&]/\\&/g; s/"/\\"/g')
-    TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-50)
-    if [ ${#TWEET_TEXT_CLEAN} -gt 50 ]; then
-      TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}..."
+    # shorten to fit into social card
+    POST_MAX_LEN=186
+    TWEET_TEXT_TRUNCATED=$(echo "$TWEET_TEXT_CLEAN" | cut -c 1-$POST_MAX_LEN)
+    if [ ${#TWEET_TEXT_CLEAN} -gt $POST_MAX_LEN ]; then
+      TWEET_TEXT_TRUNCATED="${TWEET_TEXT_TRUNCATED}…"
     fi
-    echo "Latest Bluesky post: $TWEET_TEXT_TRUNCATED"
     BSKY_PREVIEW="Latest: \"${TWEET_TEXT_TRUNCATED}\""
     if ! grep -q "<span id=[\"']${BSKY_PREVIEW_ID}[\"'][^>]*>" "$TEMP_FILE"; then
       echo "Error: ${BSKY_PREVIEW_ID} span not found in $TEMP_FILE"
