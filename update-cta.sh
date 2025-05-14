@@ -137,7 +137,7 @@ fetch_github_data() {
     fi
 
     # Update GitHub section: commit text
-    sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\" style=\"font-family: 'IBM Plex Mono', monospace;\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
+    sed -i "s|<span id=\"$GITHUB_PREVIEW_ID\".*</span>|<span id=\"$GITHUB_PREVIEW_ID\">$COMMIT_REPO: $commit</span>|g" "$TEMP_FILE"
 
     # Update the link to point to the specific repo
     sed -i "s|href=\"https://github.com/sen-laboratories\"|href=\"https://github.com/sen-laboratories/$COMMIT_REPO\"|g" "$TEMP_FILE"

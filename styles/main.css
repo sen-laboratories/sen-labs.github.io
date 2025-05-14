@@ -297,7 +297,7 @@ h2 {
 }
 
 .social-card img {
-  width: 100%;
+  width: 95%;
   height: 150px;
   object-fit: contain;
   pointer-events: none; /* Prevent image from blocking hover */
@@ -328,7 +328,7 @@ h2 {
 }
 
 /* styling for blog preview image */
-.social-card.blog .preview img {
+.social-card .blog .preview img {
   z-index: -1;
   max-width: 80%;
   height: auto;
@@ -351,17 +351,22 @@ h2 {
 }
 
 /* GitHub-specific: stack commit */
-.social-card.github .preview {
+.social-card .github .preview {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-top: 8px;
 }
+#github-preview {
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 40px;
+}
 
 /* Sponsor button styling */
 .connect-links .social-card .sponsor {
   width: 100%;
+  z-index: 10;
   text-align: center;
 }
 
