@@ -3,7 +3,7 @@
 # Configuration
 YOUTUBE_CHANNEL_ID="UCRR013YJAj1i4qM_KYciNaw"
 GITHUB_ORG="sen-laboratories"
-BSKY_HANDLE='sen-labs.org'
+BSKY_HANDLE="sen-labs.org"
 HTML_FILE="index_new.html"
 TEMP_FILE="index_new_temp.html"
 
@@ -158,12 +158,12 @@ fetch_bluesky_post() {
         "$API_KEY_URL" | jq -r .accessJwt)
 
     if [ $? -eq 22 ]; then
-      echo "failed to retrieve response from Substack."
+      echo "failed to retrieve API key from Bluesky"
       return 1
     fi
 
     # Get a user's feed
-    LIMIT=1
+    LIMIT=15
     FEED_URL="https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed"
     TWEET_RESPONSE=$(curl -s --fail-with-body -G \
         -H "Authorization: Bearer ${API_KEY}" \
