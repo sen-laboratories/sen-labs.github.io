@@ -19,25 +19,22 @@ jobs:
         run: |
           chmod +x update-cta.sh
           ./update-cta.sh --exclude-web-repo
-          sed -i 's/\r$//' index_new.html
+          sed -i 's/\r$//' index.html
         env:
           BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
           SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITH_TOKEN }}
-          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
       - name: Commit changes
         run: |
           git config --global user.email "bot@sen-labs.org"
           git config --global user.name "SEN Labs Bot"
-          git add --force index_new.html
-          git update-index --refresh
+          git add index.html
           if [[ `git status --porcelain` ]]; then
             git commit -m "Update CTA previews with latest content"
             git push
             echo "pushed latest changes, done."
           else
             echo "nothing changed, done."
-            git diff HEAD index_new.html
           fi
           
