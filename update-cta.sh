@@ -4,8 +4,8 @@
 YOUTUBE_CHANNEL_ID="UCRR013YJAj1i4qM_KYciNaw"
 GITHUB_ORG="sen-laboratories"
 BSKY_HANDLE="sen-labs.org"
-HTML_FILE="index_new.html"
-TEMP_FILE="index_new_temp.html"
+HTML_FILE="index.html"
+TEMP_FILE="index_new.html"
 
 # Preview ID placeholders
 YOUTUBE_PREVIEW_ID="youtube-preview"

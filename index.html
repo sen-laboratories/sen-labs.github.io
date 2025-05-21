@@ -1,26 +1,200 @@
 <!DOCTYPE html>
+
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Welcome to SEN - a /home for your thoughts</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <meta name="keywords" content="PKM, semantic, desktop, personal, knowledge management, filesystem, opensource, FOSS, Haiku"/>
-  </head>
-  <body>
-    <div align="center">
-      <h2>Your Knowledge, Organized:</h2>
-      <h1 style="max-inline-size: 90%;">The All-in-One File System<br/>for Seamless Data Management</h1>
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEN: a /home for your thoughts</title>
+  <!-- custom page styles -->
+  <link href="styles/main.css" rel="stylesheet">
+  <!-- Boxicons CDN for Social Icons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <!-- IBM Plex Mono for Monospaced /home -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Background Pattern with Particles.js -->
+  <div class="page-bg">
+    <div id="particles-js"></div>
+  </div>
 
-    <img src="images/sen-logo.webp" width="55%" height="auto" alt="SEN logo"/>
-
-    <div align="center">
-      <h3>Link local files, reference data seamlessly, and manage your personal knowledge with just your file browser &ndash;
-            all open-source and integrated into your filesystem.</h3>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <img src="images/sen-logo.webp" alt="SEN Logo" class="logo">
+      <h1 class="claim">a <span class="path">/home</span> for your thoughts</h1>
+      <p class="subclaim">Link local files, reference data seamlessly, and manage your personal knowledge right on your desktop – all open-source and integrated into your filesystem.</p>
     </div>
-    <footer>
-      <a href="landing.html"><h1 style="alignment: center">Enter</h1></a>
-    </footer>
-  </body>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <h2>Why SEN?</h2>
+      <p>Your desktop at the speed of thought.</p>
+      <div class="feature-grid">
+        <!-- Filesystem Integration -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Filesystem Integration</span></div>
+            <img src="images/features/sen-filesystem_still.webp" data-animated-src="images/features/sen-filesystem_animated.webp" alt="Filesystem Integration Screenshot" class="placeholder-img">
+          </div>
+          <h3>Wise up your Workspace</h3>
+          <p>> Seamlessly blends in &ndash; no tools required.</p>
+        </div>
+        <!-- Semantic Links -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Linked Data</span></div>
+            <img src="images/features/semantic-links_still.webp" data-animated-src="images/features/semantic-links_animated.webp" alt="Semantic Links Screenshot" class="placeholder-img">
+          </div>
+          <h3>Stable Semantic Links</h3>
+          <p>> Link your things in all directions.</p>
+        </div>
+        <!-- Native Relations -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Dynamic Relations</span></div>
+            <img src="images/features/sen-relations_still.webp" data-animated-src="images/features/sen-relations_animated.webp" alt="Native Relations Screenshot" class="placeholder-img">
+          </div>
+          <h3>Native Relations</h3>
+          <p>> Dynamic relations, deep links and inference.</p>
+        </div>
+        <!-- Local First -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Local First</span></div>
+            <img src="images/features/your-data_still.webp" data-animated-src="images/features/your-data_animated.webp" alt="Local First Screenshot" class="placeholder-img">
+          </div>
+          <h3>You are in Control</h3>
+          <p>> Your Knowledge, Your Space, Your Rules</p>
+        </div>
+        <!-- Remote on Demand -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Enrichment</span></div>
+            <img src="images/features/enrichment_still.webp" data-animated-src="images/features/enrichment_animated.webp" alt="Remote on Demand Screenshot" class="placeholder-img">
+          </div>
+          <h3>Remote on Demand</h3>
+          <p>> Fetch open metadata from numerous sources.</p>
+        </div>
+        <!-- With SEN, you CAN -->
+        <div class="feature-card">
+          <div class="placeholder">
+            <div class="placeholder-tab" data-max-width="300px"><span>Data Centric</span></div>
+            <img src="images/features/sen-can_still.webp" data-animated-src="images/features/sen-can_animated.webp" alt="No-Code Apps Screenshot" class="placeholder-img">
+          </div>
+          <h3>With SEN, you CAN</h3>
+          <p>> Build Dynamic Data-Centric UX without Apps</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Section -->
+  <section class="demo">
+    <div class="container">
+      <a class="btn btn-demo" href="use-cases.html">View More Use Cases</a>
+    </div>
+  </section>
+
+	<!-- Stay Tuned Section -->
+	<section class="connect">
+	  <div class="container">
+	    <h2>Stay Tuned</h2>
+	    <p>Get the latest project updates here:</p>
+	    <div class="connect-links">
+          <!-- X -->
+         <div class="social-card bsky">
+           <div class="preview">
+             <span id="bsky-preview">Latest: "This year's State of Devs 2025 survey is now/still open! survey.devographics.com/survey/state... My #presentation of #SEN from the #PKMSummit2025 is now online for your viewing pleasu…"</span>
+           </div>
+           <div class="caption"><a href="https://bsky.app/profile/sen-labs.org">Follow on Bluesky</a></div>
+         </div>
+			   <!-- Blog (Static) -->
+         <div class="social-card blog">
+           <div class="preview">
+             <span id="blog-preview"><a href="https://senlabs.substack.com/p/looking-back-at-pkm-summit-2025"><img src="https://substackcdn.com/image/fetch/w_150,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fa680ef56-1e91-4dac-a581-5be2928a42fe_6720x4480.jpeg" alt="or: being data-centric in a tool-centric world" title="Looking back at PKM Summit 2025"/></a></span>
+           </div>
+           <div class="caption"><a href="https://senlabs.substack.com/feed">Read the Blog</a></div>
+         </div>
+         <!-- YouTube -->
+         <div class="social-card youtube">
+		       <div class="preview">
+			       <span id="youtube-preview"><a href="https://www.youtube.com/watch?v=GtooRAKLCYU"><img src="https://img.youtube.com/vi/GtooRAKLCYU/0.jpg" alt="SEN Presentation at PKM Summit 2025" title="SEN Presentation at PKM Summit 2025"/></a></span>
+			      </div>
+            <div class="caption"><a href="https://www.youtube.com/channel/UCRR013YJAj1i4qM_KYciNaw">
+              Subscribe to YouTube channel</a>
+            </div>
+         </div>
+         <!-- GitHub -->
+         <div class="social-card github">
+           <div class="preview">
+             <a href="https://github.com/sen-laboratories/sen-inference">
+               <span id="github-preview">
+                 sen-inference: add location example
+               </span>
+             </a>
+           </div>
+           <div class="caption sponsor">
+             <a href="https://github.com/sponsors/sen-laboratories" target="_blank" class="sponsor-link">
+               <img src="https://img.shields.io/badge/Sponsor-sen--labs-cyan?logo=github" alt="Sponsor sen-labs">
+             </a>
+           </div>
+         </div>
+		  </div> <!-- connect links -->
+	  </div> <!-- container -->
+	</section>
+
+  <!-- Waitlist / Newsletter Section -->
+  <section class="waitlist">
+    <div class="container">
+      <div class="cta-buttons">
+        <a href="https://forms.gle/Uqv3XP1Pzkq3bGty9" class="btn btn-primary" target="_blank">Join the Waitlist</a>
+      </div>
+      <p class="waitlist-caption">Be the first to try the technical preview</p>
+    </div>
+    <div class="container">
+      <div class="cta-buttons">
+        <a href="https://senlabs.substack.com" class="btn btn-primary" target="_blank">Subscribe to Blog</a>
+      </div>
+      <p class="waitlist-caption">Stay in touch with the latest progress</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <img src="images/sen-logo.webp" alt="SEN Logo" class="logo">
+      <p>© 2025 SEN Labs. a <span class="path">/home</span> for your thoughts.</p>
+      <div class="footer-links">
+        <a href="https://github.com/sen-laboratories"><i class='bx bxl-github'></i>GitHub</a>
+        <a href="https://senlabs.substack.com">
+				<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16" viewBox="0,0,256,256">
+					<g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(10.66667,10.66667)"><path d="M20,22.724l-8,-4.572l-8,4.572v-12.724h16zM12,15.849l6,3.428v-7.277h-12v7.276zM4,6h16v2h-16zM4,2h16v2h-16z"></path></g></g>
+				</svg>
+        	Blog
+        </a>
+        <a href="https://bsky.app/profile/sen-labs.org">
+        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16" viewBox="0 0 24 24">
+	        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1">
+						<path d="M21.31,2.331c-2.636,0-6.671,3.82-9.31,7.815C9.361,6.152,5.326,2.331,2.69,2.331C1,2.331,1,4.098,1,4.947	c0,0.551,0.335,4.912,0.577,5.81c0.435,1.622,1.504,3.13,3.108,3.948c-0.552,0.452-0.949,0.984-1.149,1.586	c-0.227,0.68-0.388,2.047,1.08,3.562c1.174,1.211,2.256,1.8,3.31,1.8c1.703,0,3.166-1.91,4.075-3.458	c0.909,1.548,2.372,3.458,4.075,3.458c1.054,0,2.136-0.589,3.31-1.8c1.468-1.514,1.306-2.881,1.08-3.562	c-0.201-0.602-0.598-1.134-1.149-1.586c1.604-0.818,2.674-2.326,3.108-3.948C22.665,9.859,23,5.499,23,4.947	C23,4.098,23,2.331,21.31,2.331z M20.492,10.239c-0.44,1.64-1.885,3.376-4.492,3.044v2.084c1.613,0.36,2.395,1.042,2.567,1.558	c0.185,0.553-0.234,1.141-0.619,1.537c-1.004,1.037-1.605,1.191-1.874,1.191c-0.763,0-2.114-1.852-2.972-3.653h-1.087L12,16.007	L11.985,16h-1.087c-0.859,1.801-2.209,3.653-2.972,3.653c-0.269,0-0.869-0.155-1.874-1.191c-0.384-0.396-0.803-0.984-0.619-1.537	C5.605,16.409,6.387,15.727,8,15.367v-2.084c-2.607,0.332-4.052-1.404-4.492-3.044C3.354,9.666,3,5.613,3,4.947	c0-0.26,0.006-0.445,0.016-0.577C4.794,4.762,8.42,8.073,10.809,12h1.113h0.156h1.113c2.389-3.927,6.014-7.238,7.793-7.63	C20.994,4.502,21,4.688,21,4.947C21,5.613,20.646,9.666,20.492,10.239z"></path>
+					</g>
+				</svg>
+        	Bluesky
+        </a>
+        <a href="https://x.com/labs_sen">
+        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16" viewBox="0 0 50 50">
+					<g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1">
+						<path d="M 5.9199219 6 L 20.582031 27.375 L 6.2304688 44 L 9.4101562 44 L 21.986328 29.421875 L 31.986328 44 L 44 44 L 28.681641 21.669922 L 42.199219 6 L 39.029297 6 L 27.275391 19.617188 L 17.933594 6 L 5.9199219 6 z M 9.7167969 8 L 16.880859 8 L 40.203125 42 L 33.039062 42 L 9.7167969 8 z"></path>
+					</g>
+				</svg>
+        X (ex Twitter)</a>
+        <a href="https://youtube.com/@sen-labs"><i class='bx bxl-youtube'></i>YouTube</a>
+      </div>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
 </html>
