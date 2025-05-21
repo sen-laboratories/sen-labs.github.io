@@ -62,7 +62,7 @@ body, html {
 }
 .subclaim {
   font-family: 'Visby Regular', sans-serif;
-  font-size: 16px;
+  font-size: 21px;
   color: #F7F2E1;
   margin-bottom: 30px;
   max-width: 600px;
@@ -104,7 +104,8 @@ body, html {
   font-size: 16px;
   padding: 20px;
   border: 1px dashed #F7F2E1;
-  max-width: 70%;
+  width: 240px;	 /* 288 on hover with 1.2 scale */
+	height: 230px; /* 276 on hover with 1.2 scale */
   margin: 40px auto 0;
   position: relative;
   transition: all 0.3s ease;
@@ -115,19 +116,19 @@ body, html {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 .placeholder-img {
-  width: 100%;
-  height: auto;
-  display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 /* Haiku-Style Tab for Placeholders */
 .placeholder-tab {
   position: absolute;
-  top: -20px;
-  left: 10px;
-  width: 70px;
-  height: 20px;
-  background: linear-gradient(to bottom, #78b4ff, #5a9bff);
-  border: 1px solid #2EBFD4;
+  top: -28px;
+	height: 26px;
+	padding-left: 8px;
+	padding-right: 8px;
+	background: linear-gradient(to bottom, #9fbee6, #3b88ff);
+	border: 1px solid #14467B;
   border-bottom: none;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   z-index: 1;
@@ -142,8 +143,8 @@ body, html {
   user-select: none;
 }
 .placeholder-tab span {
-  font-family: 'Visby Regular', sans-serif;
-  font-size: 12px;
+  font-family: 'Visby Bold', sans-serif;
+  font-size: 14px;
   color: #F4F4F4;
 }
 /* Features Section */
@@ -159,7 +160,7 @@ h2 {
 }
 .features p {
   font-family: 'Visby Regular', sans-serif;
-  font-size: 16px;
+  font-size: 21px;
   color: #F7F2E1;
   margin-bottom: 40px;
 }
@@ -186,7 +187,7 @@ h2 {
 }
 .feature-card p {
   font-family: 'Visby Regular', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   color: #F7F2E1;
   margin: 0;
 }
@@ -376,7 +377,7 @@ h2 {
 
 /* Caption styling */
 .connect-links .social-card .caption {
-  font-size: 14px;
+  font-size: 16px;
   color: #FEFEFE; /* Lighter grey for contrast on dark background */
   width: 100%;
   text-align: left;
@@ -437,7 +438,7 @@ h2 {
 }
 .footer-links a {
   font-family: 'Visby Light', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #F7F2E1;
   text-decoration: none;
   cursor: pointer;
@@ -462,9 +463,9 @@ h2 {
     height: 125px; /* Increased by 25% for mobile */
   }
   .connect-links .social-card .preview span {
-    font-size: 13px;
+    font-size: 14px;
   }
   .connect-links .social-card .caption {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
