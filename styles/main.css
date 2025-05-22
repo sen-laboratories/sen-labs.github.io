@@ -305,13 +305,7 @@ h2 {
   object-fit: contain;
   pointer-events: none; /* Prevent image from blocking hover */
 }
-.social-card.blog img {
-  width: 100%;
-  height: auto;
-  overflow: auto;
-  pointer-events: none; /* Prevent image from blocking hover */
-}
-
+  
 .social-card.youtube::after {
   background-image: url('../assets/images/youtube-icon.svg');
 }
@@ -338,14 +332,19 @@ h2 {
 }
 
 /* styling for blog preview image */
+.social-card .blog .preview {
+	width: 90%;
+  height: auto;
+}
+
 .social-card .blog .preview img {
   z-index: -1;
-  max-width: 80%;
+  max-width: 100%;
   height: auto;
   margin-bottom: 8px;
   border-radius: 8px;
-}
-
+}  
+  
 .social-card .youtube .preview img {
   z-index: -1;
   max-width: 80%;
