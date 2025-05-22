@@ -25,18 +25,37 @@ particlesJS("particles-js", {
   "retina_detect": true
 });
 
+function isMobile() {
+	var agentDetails = navigator.userAgent;
+  return (/Android|Mobi|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(agentDetails) );
+}
+
 // Feature Cards Slide-In
 const featureCards = document.querySelectorAll('.feature-card');
-const observerOptions = { root: null, rootMargin: '-300px', threshold: 0.1 };
+const observerOptions = {
+    root: null,
+    rootMargin: isMobile() ? '-100px' : '-200px', // Smaller margin for mobile
+    threshold: isMobile() ? 0.05 : 0.1 // Less strict threshold for mobile
+};
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
-  });
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+	        	console.log('Card intersecting:', entry.isIntersecting, entry.target);
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+        }
+    });
 }, observerOptions);
 featureCards.forEach(card => observer.observe(card));
+
+featureCards.forEach(card => {
+    const rect = card.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom >= 0) {
+        card.classList.add('visible');
+    } else {
+        observer.observe(card);
+    }
+});
 
 // Draggable Tabs with Touch Support
 document.querySelectorAll('.placeholder-tab').forEach(tab => {

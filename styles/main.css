@@ -72,7 +72,7 @@ body, html {
 .cta-buttons {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 14px;
 }
@@ -174,7 +174,7 @@ h2 {
   text-align: left;
   opacity: 0;
   transform: translateY(50px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 .feature-card.visible {
   opacity: 1;
@@ -272,13 +272,13 @@ h2 {
 
 /* Preview area (content) */
 .social-card .preview {
-  width: 100%;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 10px;
+	padding: 14px 8px;
+	overflow: auto;
 }
 
 #bsky-preview {
@@ -326,6 +326,7 @@ h2 {
   width: 100%;
   text-align: left;
   font-size: 14px;
+  padding-left: 4px;
 }
 
 /* styling for blog preview image */
@@ -393,11 +394,11 @@ h2 {
 .waitlist {
   display: flex;
   justify-content: center;
+  column-count: 2;
+	max-width: 40%;
+	padding-left: 28%;
+	padding-block: 24px;
 }
-.waitlist .container {
-  margin: 24px;
-}
-
 .waitlist-caption {
   font-family: 'Visby Regular', sans-serif;
   font-size: 14px;
